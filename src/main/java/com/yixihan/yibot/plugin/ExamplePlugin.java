@@ -1,12 +1,16 @@
 package com.yixihan.yibot.plugin;
 
+import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.http.HttpRequest;
 import com.mikuac.shiro.annotation.GroupMessageHandler;
 import com.mikuac.shiro.annotation.MessageHandler;
 import com.mikuac.shiro.annotation.PrivateMessageHandler;
 import com.mikuac.shiro.annotation.Shiro;
+import com.mikuac.shiro.bean.MsgChainBean;
 import com.mikuac.shiro.common.utils.MsgUtils;
 import com.mikuac.shiro.common.utils.ShiroUtils;
 import com.mikuac.shiro.core.Bot;
+import com.mikuac.shiro.dto.event.Event;
 import com.mikuac.shiro.dto.event.message.AnyMessageEvent;
 import com.mikuac.shiro.dto.event.message.GroupMessageEvent;
 import com.mikuac.shiro.dto.event.message.PrivateMessageEvent;
@@ -20,6 +24,8 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import java.lang.reflect.Field;
+import java.util.*;
 import java.util.regex.Matcher;
 
 /**
@@ -39,65 +45,45 @@ public class ExamplePlugin {
     @Resource
     private GroupMessageService groupMessageService;
 
-    /**
-     * 符合 cmd 正则表达式的消息会被响应
-     * @param bot
-     * @param event
-     * @param matcher
-     */
-    @PrivateMessageHandler(cmd = "hi")
-    public void fun1(@NotNull Bot bot, @NotNull PrivateMessageEvent event, @NotNull Matcher matcher) {
-        // 构建消息
-        String sendMsg = MsgUtils.builder().face(66).text("Hello, this is shiro demo.").build();
-        // 发送私聊消息
-        bot.sendPrivateMsg(event.getUserId(), sendMsg, false);
-        PrivateMessage message = new PrivateMessage ();
-        message.setMessageId ((long) event.getMessageId ());
-        message.setSubType (event.getSubType ());
-        message.setTmpSource (event.getTempSource ());
-        message.setGroupId (event.getPrivateSender ().getGroupId ());
-        message.setUserId (event.getPrivateSender ().getUserId ());
-        message.setNickname (event.getPrivateSender ().getNickname ());
-        message.setMessage (ShiroUtils.escape (event.getMessage ()));
-        privateMessageService.save (message);
-        log.info (event.toString ());
-    }
-
-    /**
-     * 如果 at 参数设定为 AtEnum.NEED 则只有 at 了机器人的消息会被响应
-     *
-     * @param event
-     */
-    @GroupMessageHandler(at = AtEnum.OFF)
-    public void fun2(@NotNull GroupMessageEvent event) {
-        // 以注解方式调用可以根据自己的需要来为方法设定参数
-        // 例如群组消息可以传递 GroupMessageEvent, Bot, Matcher 多余的参数会被设定为 null
-        log.info(event.getMessage());
-        log.info (event.toString ());
-        GroupMessage message = new GroupMessage ();
-        message.setMessageId ((long) event.getMessageId ());
-        message.setSubType (event.getSubType ());
-        message.setGroupId (event.getGroupId ());
-        if (event.getSender () != null) {
-            message.setUserId (Long.valueOf (event.getSender ().getUserId ()));
-            message.setNickname (event.getSender ().getNickname ());
-        } else if (event.getAnonymous () != null) {
-            message.setUserId (event.getAnonymous ().getId ());
-            message.setNickname (event.getAnonymous ().getName ());
-        }
-        message.setMessage (ShiroUtils.escape (event.getMessage ()));
-        groupMessageService.save (message);
-    }
-
-    /**
-     * 同时监听群组及私聊消息 并根据消息类型（私聊，群聊）回复
-     *
-     * @param bot
-     * @param event
-     */
     @MessageHandler
-    public void fun3(@NotNull Bot bot, @NotNull AnyMessageEvent event) {
-        bot.sendMsg(event, "hello", false);
+    public void testCQCode (@NotNull Bot bot, @NotNull AnyMessageEvent event) {
+        log.info (toString (event));
+        if (!"3113788997".equals (event.getSender ().getUserId ())) {
+            return;
+        }
+        List<String> msgImgUrlList = ShiroUtils.getMsgImgUrlList (event.getArrayMsg ());
+        List<String> msgList = new ArrayList<> ();
+        if (!CollectionUtil.isEmpty (msgImgUrlList)) {
+            for (String msgImgUrl : msgImgUrlList) {
+                MsgChainBean msb = new MsgChainBean ();
+                msb.setType ("image");
+                HashMap<String, String> map = new HashMap<> ();
+                map.put ("file", msgImgUrl);
+                msb.setData (map);
+                msgList.add (ShiroUtils.jsonToCode (msb));
+            }
+            List<Map<String, Object>> forwardMsg = ShiroUtils.generateForwardMsg(
+                    Long.parseLong (event.getSender ().getUserId ()),
+                    event.getSender ().getNickname (),
+                    msgList
+            );
+            bot.sendPrivateForwardMsg (
+                    Long.parseLong (event.getSender ().getUserId ()),
+                    forwardMsg
+            );
+        }
+
+    }
+
+
+    private String toString (AnyMessageEvent event) {
+        return new StringBuilder ("\n").append ("messageId : ").append (event.getMessageId ()).append ("\n")
+                .append ("subType : ").append (event.getSubType ()).append ("\n")
+                .append ("groupId : ").append (event.getGroupId ()).append ("\n")
+                .append ("message : ").append (event.getMessage ()).append ("\n")
+                .append ("sender : ").append (event.getSender ()).append ("\n")
+                .append ("anonymous : ").append (event.getAnonymous ())
+                .toString ();
     }
 
 }
