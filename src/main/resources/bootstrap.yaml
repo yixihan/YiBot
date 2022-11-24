@@ -3,6 +3,6 @@ server:
 
 spring:
   application:
-    name: yicode-auth
+    name: yi-bot
   profiles:
     active: dev

@@ -90,6 +90,12 @@
             <version>${shiro.version}</version>
         </dependency>
 
+        <dependency>
+            <groupId>com.vdurmont</groupId>
+            <artifactId>emoji-java</artifactId>
+            <version>4.0.0</version>
+        </dependency>
+
         <!-- oss -->
         <dependency>
             <groupId>com.alibaba.cloud</groupId>
