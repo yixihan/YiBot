@@ -17,3 +17,6 @@ spring:
           - data-id: qqbot-common-dev.yaml
             group: DEV
             refresh: true
+          - data-id: qqbot-setu-dev.yaml
+            group: DEV
+            refresh: true
