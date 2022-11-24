@@ -1,0 +1,19 @@
+spring:
+  cloud:
+    nacos:
+      username: yicode
+      password: yicode
+      discovery:
+        server-addr: 175.24.163.161:3333
+        namespace: qqbot
+      config:
+        server-addr: 175.24.163.161:3333
+        namespace: qqbot
+        file-extension: yaml
+        extension-configs:
+          - data-id: qqbot-dev.yaml
+            group: DEV
+            refresh: true
+          - data-id: qqbot-common-dev.yaml
+            group: DEV
+            refresh: true

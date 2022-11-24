@@ -1,0 +1,8 @@
+server:
+  port: 19999
+
+spring:
+  application:
+    name: yicode-auth
+  profiles:
+    active: dev
