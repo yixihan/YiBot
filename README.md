@@ -30,3 +30,20 @@
 
 ![](https://github.com/yixihan/yibot/blob/master/assets/github-contribution-grid-snake.svg)
 </div>
+
+
+## 帮助文档
+
+- [shiro 文档](https://misakatat.github.io/shiro-docs/)
+- [go-cqhttp 文档](https://docs.go-cqhttp.org/)
+
+
+## TODO
+- [x] 复读
+- [x] 色图
+- [ ] 签到
+- [ ] 自动提醒
+- [ ] 查看撤回消息
+- [ ] 戳一戳事件回应
+- [ ] 翻译
+
