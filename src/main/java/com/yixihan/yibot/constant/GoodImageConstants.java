@@ -25,6 +25,15 @@ public class GoodImageConstants {
     @Value ("${setu.list}")
     private String val;
 
+    @Value ("${setu.setnx-key}")
+    private String setnxKey;
+
+    @Value ("${setu.setnx-cnt}")
+    private Long setnxCnt;
+
+    @Value ("${setu.setnx-time}")
+    private Long setnxTime;
+
     private final List<String> whiteList = new ArrayList<> ();
 
     public void initList () {
