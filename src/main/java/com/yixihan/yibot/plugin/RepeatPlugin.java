@@ -6,19 +6,16 @@ import com.mikuac.shiro.annotation.Shiro;
 import com.mikuac.shiro.core.Bot;
 import com.mikuac.shiro.dto.event.message.GroupMessageEvent;
 import com.mikuac.shiro.enums.AtEnum;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import com.yixihan.yibot.pojo.RepeatNode;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * description
+ * 复读插件
  *
  * @author yixihan
  * @date 2022/11/24 21:00
@@ -27,45 +24,31 @@ import java.util.concurrent.ConcurrentHashMap;
 @Shiro
 @Component
 public class RepeatPlugin {
-
-    private Map<Long, RepeatNode> repeatNodeMap = new ConcurrentHashMap<> ();
-
     private static final int MAX_CNT = 3;
+    private final Map<Long, RepeatNode> repeatNodeMap = new ConcurrentHashMap<> ();
 
     @GroupMessageHandler(at = AtEnum.OFF)
     public void GroupRepeatMessage(@NotNull Bot bot, @NotNull GroupMessageEvent event) {
         RepeatNode node = repeatNodeMap.getOrDefault (event.getGroupId (), new RepeatNode ());
 
-        if (StrUtil.isBlank (node.lastMessage)) {
-            node.lastMessage = event.getMessage ();
-            node.flag = false;
-            node.cnt++;
+        if (StrUtil.isBlank (node.getLastMessage ())) {
+            node.setLastMessage (event.getMessage ());
+            node.setFlag (false);
+            node.setCnt (1);
         } else {
-            if (node.lastMessage.equals (event.getMessage ())) {
-                node.cnt++;
-                log.info ("message : {}, cnt : {}", event.getMessage (), node.cnt);
-                if (node.cnt >= MAX_CNT && !node.flag) {
+            if (node.getLastMessage ().equals (event.getMessage ())) {
+                node.setCnt (node.getCnt () + 1);
+                log.info ("message : {}, cnt : {}", event.getMessage (), node.getCnt ());
+                if (node.getCnt () >= MAX_CNT && !node.isFlag ()) {
                     bot.sendGroupMsg (event.getGroupId (), event.getMessage (), false);
-                    node.flag = true;
+                    node.setFlag (true);
                 }
             } else {
-                node.flag = false;
-                node.cnt = 0;
-                node.lastMessage = event.getMessage ();
+                node.setFlag (false);
+                node.setCnt (0);
+                node.setLastMessage (event.getMessage ());
             }
         }
         repeatNodeMap.put (event.getGroupId (), node);
-    }
-
-    @Data
-    @AllArgsConstructor
-    @NoArgsConstructor
-    class RepeatNode {
-
-        private String lastMessage;
-
-        private int cnt;
-
-        private boolean flag;
     }
 }
