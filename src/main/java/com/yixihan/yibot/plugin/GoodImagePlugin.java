@@ -53,13 +53,12 @@ public class GoodImagePlugin {
             return;
         }
         String message;
-        if (!getToken (event.getGroupId ())) {
+        if (! hasToken (event.getGroupId ())) {
             message = extracted (
                     event.getSender () != null ?
                             event.getSender ().getUserId () :
                             String.valueOf (event.getAnonymous ().getId ()), CQCodeEnums.AT) + "别冲啦, 对弟弟好点儿(￣_￣|||)";
             bot.sendGroupMsg (event.getGroupId (), message, false);
-            return;
         }
         String[] splits = event.getMessage ().split (" ");
         String tag = splits.length >= 2 ? splits[1] : null;
@@ -71,6 +70,12 @@ public class GoodImagePlugin {
                     event.getSender () != null ?
                             event.getSender ().getUserId () :
                             String.valueOf (event.getAnonymous ().getId ()), CQCodeEnums.AT) + "搜不到" + tag + ", 似乎不能涩涩了捏";
+            bot.sendGroupMsg (event.getGroupId (), message, false);
+        } else if (!getToken (event.getGroupId ())) {
+            message = extracted (
+                    event.getSender () != null ?
+                            event.getSender ().getUserId () :
+                            String.valueOf (event.getAnonymous ().getId ()), CQCodeEnums.AT) + "别冲啦, 对弟弟好点儿(￣_￣|||)";
             bot.sendGroupMsg (event.getGroupId (), message, false);
         } else {
             message = extracted (msgList.get (0), CQCodeEnums.IMAGE);
@@ -142,7 +147,6 @@ public class GoodImagePlugin {
         log.info ("开始重置限流key...");
 
         for (String groupId : constants.getVal ().split (", ")) {
-            log.info ("重置群 : {}",groupId);
             String key = String.format (constants.getSetnxKey (), groupId);
             redisTemplate.opsForValue ().set (key,
                     constants.getSetnxCnt (),
@@ -162,6 +166,11 @@ public class GoodImagePlugin {
             redisTemplate.opsForValue ().set (key, cnt);
             return true;
         }
+    }
+
+    private boolean hasToken (Long groupId) {
+        String key = String.format (constants.getSetnxKey (), groupId);
+        return Integer.parseInt (Optional.ofNullable (redisTemplate.opsForValue ().get (key)).orElse ("-1").toString ()) >= 0;
     }
 
     @Data
