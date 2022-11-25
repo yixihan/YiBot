@@ -16,6 +16,7 @@ import com.mikuac.shiro.dto.event.message.GroupMessageEvent;
 import com.mikuac.shiro.enums.AtEnum;
 import com.yixihan.yibot.constant.GoodImageConstants;
 import com.yixihan.yibot.enums.CQCodeEnums;
+import com.yixihan.yibot.utils.CQCodeUtils;
 import io.swagger.models.auth.In;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -50,7 +51,7 @@ public class GoodImagePlugin {
     @Resource
     private RedisTemplate<String, Object> redisTemplate;
 
-    @GroupMessageHandler(at = AtEnum.OFF, cmd = "^(色色|瑟瑟|涩涩|sese).*$")
+    @GroupMessageHandler(at = AtEnum.OFF, cmd = "^(色色|瑟瑟|涩涩).*$")
     public void getImage(@NotNull Bot bot, @NotNull GroupMessageEvent event) {
         // 群号在非白名单内
         if (!constants.getVal ().contains (String.valueOf (event.getGroupId ()))) {
@@ -59,7 +60,7 @@ public class GoodImagePlugin {
         String message;
         // key 已经用完
         if (! hasToken (event.getGroupId ())) {
-            message = extracted (event.getSender ().getUserId (), CQCodeEnums.AT)
+            message = CQCodeUtils.extracted (event.getSender ().getUserId (), CQCodeEnums.AT)
                     + "别冲啦, 对弟弟好点儿(￣_￣|||)";
             bot.sendGroupMsg (event.getGroupId (), message, false);
         }
@@ -69,12 +70,12 @@ public class GoodImagePlugin {
 
         if (msgList == null) {
             // 没有搜到 setu
-            message = extracted (event.getSender ().getUserId (), CQCodeEnums.AT)
+            message = CQCodeUtils.extracted (event.getSender ().getUserId (), CQCodeEnums.AT)
                     + "搜不到" + tag + ", 似乎不能涩涩了捏〒▽〒";
             bot.sendGroupMsg (event.getGroupId (), message, false);
         } else {
             // 搜到色图
-            message = extracted (msgList.get (0), CQCodeEnums.IMAGE);
+            message = CQCodeUtils.extracted (msgList.get (0), CQCodeEnums.IMAGE);
             msgList.add (message);
             msgList.remove (0);
             List<Map<String, Object>> forwardMsg = ShiroUtils.generateForwardMsg (
@@ -82,40 +83,20 @@ public class GoodImagePlugin {
                     event.getSender ().getNickname (),
                     msgList);
             ActionData<MsgId> actionData = bot.sendGroupForwardMsg (event.getGroupId (), forwardMsg);
-            if (actionData.getRetCode () > 1) {
+            if (actionData == null && actionData.getRetCode () > 1) {
                 // 如果消息未发送成功
-                message = extracted (event.getSender ().getUserId (), CQCodeEnums.AT)
+                message = CQCodeUtils.extracted (event.getSender ().getUserId (), CQCodeEnums.AT)
                         + "图片被风控捏(´。＿。｀)";
                 bot.sendGroupMsg (event.getGroupId (), message, false);
             } else {
                 // 如果消息发送成功
-                message = extracted (event.getSender ().getUserId (), CQCodeEnums.AT)
+                message = CQCodeUtils.extracted (event.getSender ().getUserId (), CQCodeEnums.AT)
                         + "可以涩涩ヾ(≧▽≦*)o";
                 bot.sendGroupMsg (event.getGroupId (), message, false);
                 // key - 1
                 getToken (event.getGroupId ());
             }
         }
-    }
-
-
-    /**
-     * 组装 CQ code
-     *
-     * @param val 信息
-     * @param type CQ code type
-     */
-    private static String extracted(String val, CQCodeEnums type) {
-        MsgChainBean msb = new MsgChainBean ();
-        msb.setType (type.getType ());
-        HashMap<String, String> map = new HashMap<> ();
-        if (CQCodeEnums.IMAGE.equals (type)) {
-            map.put ("file", val);
-        } else if (CQCodeEnums.AT.equals (type)) {
-            map.put ("qq", val);
-        }
-        msb.setData (map);
-        return ShiroUtils.jsonToCode (msb);
     }
 
     private List<String> getImage(@Nullable String val) {

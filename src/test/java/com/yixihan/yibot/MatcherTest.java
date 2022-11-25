@@ -1,18 +1,14 @@
 package com.yixihan.yibot;
 
 import cn.hutool.core.util.StrUtil;
-import cn.hutool.extra.emoji.EmojiUtil;
 import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpResponse;
-import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import com.yixihan.yibot.constant.PatternConstants;
 import org.junit.jupiter.api.Test;
 
 import javax.annotation.Nullable;
-import java.util.List;
-import java.util.regex.Matcher;
 
 /**
  * description
@@ -68,17 +64,14 @@ public class MatcherTest {
     }
 
     @Test
-    public void testGetImage () {
+    public void testGetImage() {
         System.out.println (getImage (null));
     }
 
-    private String getImage (@Nullable String val) {
+    private String getImage(@Nullable String val) {
         String[] tag = new String[]{val};
         String body = JSONUtil.toJsonStr (tag);
-        HttpResponse response = HttpRequest.post ("https://api.lolicon.app/setu/v2")
-                .header ("Content-Type", "application/json")
-                .body (body)
-                .execute ();
+        HttpResponse response = HttpRequest.post ("https://api.lolicon.app/setu/v2").header ("Content-Type", "application/json").body (body).execute ();
 
         if (response.isOk ()) {
             JSONObject obj = JSONUtil.parseObj (response.body ());
