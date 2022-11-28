@@ -7,7 +7,6 @@ import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import com.mikuac.shiro.annotation.GroupMessageHandler;
 import com.mikuac.shiro.annotation.Shiro;
-import com.mikuac.shiro.bean.MsgChainBean;
 import com.mikuac.shiro.common.utils.ShiroUtils;
 import com.mikuac.shiro.core.Bot;
 import com.mikuac.shiro.dto.action.common.ActionData;
@@ -17,12 +16,10 @@ import com.mikuac.shiro.enums.AtEnum;
 import com.yixihan.yibot.constant.GoodImageConstants;
 import com.yixihan.yibot.enums.CQCodeEnums;
 import com.yixihan.yibot.utils.CQCodeUtils;
-import io.swagger.models.auth.In;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import lombok.val;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -31,7 +28,10 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -59,9 +59,8 @@ public class GoodImagePlugin {
         }
         String message;
         // key 已经用完
-        if (! hasToken (event.getGroupId ())) {
-            message = CQCodeUtils.extracted (event.getSender ().getUserId (), CQCodeEnums.AT)
-                    + "别冲啦, 对弟弟好点儿(￣_￣|||)";
+        if (!hasToken (event.getGroupId ())) {
+            message = CQCodeUtils.extracted (event.getSender ().getUserId (), CQCodeEnums.AT) + "别冲啦, 对弟弟好点儿(￣_￣|||)";
             bot.sendGroupMsg (event.getGroupId (), message, false);
         }
         String[] splits = event.getMessage ().split (" ");
@@ -70,28 +69,22 @@ public class GoodImagePlugin {
 
         if (msgList == null) {
             // 没有搜到 setu
-            message = CQCodeUtils.extracted (event.getSender ().getUserId (), CQCodeEnums.AT)
-                    + "搜不到" + tag + ", 似乎不能涩涩了捏〒▽〒";
+            message = CQCodeUtils.extracted (event.getSender ().getUserId (), CQCodeEnums.AT) + "搜不到" + tag + ", 似乎不能涩涩了捏〒▽〒";
             bot.sendGroupMsg (event.getGroupId (), message, false);
         } else {
             // 搜到色图
             message = CQCodeUtils.extracted (msgList.get (0), CQCodeEnums.IMAGE);
             msgList.add (message);
             msgList.remove (0);
-            List<Map<String, Object>> forwardMsg = ShiroUtils.generateForwardMsg (
-                    Long.parseLong (event.getSender ().getUserId ()),
-                    event.getSender ().getNickname (),
-                    msgList);
+            List<Map<String, Object>> forwardMsg = ShiroUtils.generateForwardMsg (Long.parseLong (event.getSender ().getUserId ()), event.getSender ().getNickname (), msgList);
             ActionData<MsgId> actionData = bot.sendGroupForwardMsg (event.getGroupId (), forwardMsg);
             if (actionData == null && actionData.getRetCode () > 1) {
                 // 如果消息未发送成功
-                message = CQCodeUtils.extracted (event.getSender ().getUserId (), CQCodeEnums.AT)
-                        + "图片被风控捏(´。＿。｀)";
+                message = CQCodeUtils.extracted (event.getSender ().getUserId (), CQCodeEnums.AT) + "图片被风控捏(´。＿。｀)";
                 bot.sendGroupMsg (event.getGroupId (), message, false);
             } else {
                 // 如果消息发送成功
-                message = CQCodeUtils.extracted (event.getSender ().getUserId (), CQCodeEnums.AT)
-                        + "可以涩涩ヾ(≧▽≦*)o";
+                message = CQCodeUtils.extracted (event.getSender ().getUserId (), CQCodeEnums.AT) + "可以涩涩ヾ(≧▽≦*)o";
                 bot.sendGroupMsg (event.getGroupId (), message, false);
                 // key - 1
                 getToken (event.getGroupId ());
@@ -102,10 +95,7 @@ public class GoodImagePlugin {
     private List<String> getImage(@Nullable String val) {
         String body = JSONUtil.toJsonStr (new RequestBody (new String[]{val}));
         try {
-            HttpResponse response = HttpRequest.post (constants.getUrl ())
-                    .header ("Content-Type", "application/json")
-                    .body (body)
-                    .execute ();
+            HttpResponse response = HttpRequest.post (constants.getUrl ()).header ("Content-Type", "application/json").body (body).execute ();
             if (response.isOk ()) {
 
                 JSONObject obj = JSONUtil.parseObj (response.body ());
@@ -132,15 +122,12 @@ public class GoodImagePlugin {
      * <p>
      * 设置白名单群限流
      */
-    @Scheduled (cron = "0 * * * * ?")
+    @Scheduled(cron = "0 * * * * ?")
     @PostConstruct
-    public void setnx () {
+    public void setnx() {
         for (String groupId : constants.getVal ().split (", ")) {
             String key = String.format (constants.getSetnxKey (), groupId);
-            redisTemplate.opsForValue ().set (key,
-                    constants.getSetnxCnt (),
-                    constants.getSetnxTime (),
-                    TimeUnit.MINUTES);
+            redisTemplate.opsForValue ().set (key, constants.getSetnxCnt (), constants.getSetnxTime (), TimeUnit.MINUTES);
         }
     }
 
@@ -149,7 +136,7 @@ public class GoodImagePlugin {
      *
      * @param groupId 群号
      */
-    private synchronized boolean getToken (Long groupId) {
+    private synchronized boolean getToken(Long groupId) {
         String key = String.format (constants.getSetnxKey (), groupId);
         int cnt = Integer.parseInt (Optional.ofNullable (redisTemplate.opsForValue ().get (key)).orElse ("-1").toString ());
 
@@ -167,7 +154,7 @@ public class GoodImagePlugin {
      *
      * @param groupId 群号
      */
-    private boolean hasToken (Long groupId) {
+    private boolean hasToken(Long groupId) {
         String key = String.format (constants.getSetnxKey (), groupId);
         return Integer.parseInt (Optional.ofNullable (redisTemplate.opsForValue ().get (key)).orElse ("-1").toString ()) >= 0;
     }

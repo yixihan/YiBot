@@ -16,7 +16,7 @@ import java.util.HashMap;
 @Slf4j
 public class CQCodeUtils {
 
-    public static CQCodeEnums getCQCodeEnum (String type) {
+    public static CQCodeEnums getCQCodeEnum(String type) {
         CQCodeEnums enums = null;
         try {
             enums = CQCodeEnums.valueOf (type);
@@ -29,7 +29,7 @@ public class CQCodeUtils {
     /**
      * 组装 CQ code
      *
-     * @param val 信息
+     * @param val  信息
      * @param type CQ code type
      */
     public static String extracted(String val, CQCodeEnums type) {

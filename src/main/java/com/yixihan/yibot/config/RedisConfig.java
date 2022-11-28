@@ -28,29 +28,29 @@ public class RedisConfig {
     public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory factory) {
 
         // 为了开发方便,一般使用 <String, Object>
-        RedisTemplate<String, Object> template = new RedisTemplate<String,Object>();
-        template.setConnectionFactory(factory);
+        RedisTemplate<String, Object> template = new RedisTemplate<String, Object> ();
+        template.setConnectionFactory (factory);
 
         // Jackson 序列化配置
-        Jackson2JsonRedisSerializer<Object> jackson2JsonRedisSerializer = new Jackson2JsonRedisSerializer<>(Object.class);
+        Jackson2JsonRedisSerializer<Object> jackson2JsonRedisSerializer = new Jackson2JsonRedisSerializer<> (Object.class);
         ObjectMapper om = new ObjectMapper ();
-        om.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);
-        om.activateDefaultTyping(LaissezFaireSubTypeValidator.instance,ObjectMapper.DefaultTyping.NON_FINAL);
-        jackson2JsonRedisSerializer.setObjectMapper(om);
+        om.setVisibility (PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);
+        om.activateDefaultTyping (LaissezFaireSubTypeValidator.instance, ObjectMapper.DefaultTyping.NON_FINAL);
+        jackson2JsonRedisSerializer.setObjectMapper (om);
         // String 的序列化
-        StringRedisSerializer stringRedisSerializer = new StringRedisSerializer();
+        StringRedisSerializer stringRedisSerializer = new StringRedisSerializer ();
 
 
         // 配置具体的序列化方式
         // key 采用 String 的序列化方式
-        template.setKeySerializer(stringRedisSerializer);
+        template.setKeySerializer (stringRedisSerializer);
         // hash 的 key 采用 String 的序列化方式
-        template.setHashKeySerializer(stringRedisSerializer);
+        template.setHashKeySerializer (stringRedisSerializer);
         // value 采用 Jackson 的序列化方式
-        template.setValueSerializer(jackson2JsonRedisSerializer);
+        template.setValueSerializer (jackson2JsonRedisSerializer);
         // hash 的 value 采用 Jackson 的序列化方式
-        template.setHashValueSerializer(jackson2JsonRedisSerializer);
-        template.afterPropertiesSet();
+        template.setHashValueSerializer (jackson2JsonRedisSerializer);
+        template.afterPropertiesSet ();
 
         return template;
     }

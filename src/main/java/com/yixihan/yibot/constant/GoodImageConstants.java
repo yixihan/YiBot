@@ -1,6 +1,5 @@
 package com.yixihan.yibot.constant;
 
-import cn.hutool.core.util.StrUtil;
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -19,24 +18,24 @@ import java.util.List;
 @Getter
 public class GoodImageConstants {
 
-    @Value ("${setu.api}")
+    @Value("${setu.api}")
     private String url;
 
-    @Value ("${setu.list}")
+    @Value("${setu.list}")
     private String val;
 
-    @Value ("${setu.setnx-key}")
+    @Value("${setu.setnx-key}")
     private String setnxKey;
 
-    @Value ("${setu.setnx-cnt}")
+    @Value("${setu.setnx-cnt}")
     private Long setnxCnt;
 
-    @Value ("${setu.setnx-time}")
+    @Value("${setu.setnx-time}")
     private Long setnxTime;
 
     private final List<String> whiteList = new ArrayList<> ();
 
-    public void initList () {
+    public void initList() {
         String[] splits = val.split (", ");
         whiteList.addAll (Arrays.asList (splits));
     }

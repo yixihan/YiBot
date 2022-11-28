@@ -16,9 +16,9 @@ public class ScheduledConfig {
 
     @Bean
     public TaskScheduler taskScheduler() {
-        ThreadPoolTaskScheduler scheduling = new ThreadPoolTaskScheduler();
-        scheduling.setPoolSize(10);
-        scheduling.initialize();
+        ThreadPoolTaskScheduler scheduling = new ThreadPoolTaskScheduler ();
+        scheduling.setPoolSize (10);
+        scheduling.initialize ();
         return scheduling;
     }
 }
