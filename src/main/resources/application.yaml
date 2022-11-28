@@ -31,6 +31,10 @@ spring:
     # 允许重载 bean
     allow-bean-definition-overriding: true
 
+shiro:
+  plugin-list:
+    - com.yixihan.yibot.plugin.PokePlugin
+
 management:
   endpoints:
     web:
