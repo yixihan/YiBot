@@ -7,6 +7,7 @@ import com.mikuac.shiro.bean.MsgChainBean;
 import com.mikuac.shiro.common.utils.ShiroUtils;
 import com.mikuac.shiro.core.Bot;
 import com.mikuac.shiro.dto.event.message.AnyMessageEvent;
+import com.yixihan.yibot.utils.CommonUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
@@ -29,7 +30,7 @@ public class ExamplePlugin {
 
     @MessageHandler
     public void testCQCode(@NotNull Bot bot, @NotNull AnyMessageEvent event) {
-        log.info (toString (event));
+        log.info (CommonUtils.toString (event));
         if (!"3113788997".equals (event.getSender ().getUserId ())) {
             return;
         }
@@ -51,14 +52,6 @@ public class ExamplePlugin {
     }
 
 
-    private String toString (AnyMessageEvent event) {
-        return new StringBuilder ("\n").append ("messageId : ").append (event.getMessageId ()).append ("\n")
-                .append ("subType : ").append (event.getSubType ()).append ("\n")
-                .append ("groupId : ").append (event.getGroupId ()).append ("\n")
-                .append ("message : ").append (event.getMessage ()).append ("\n")
-                .append ("sender : ").append (event.getSender ()).append ("\n")
-                .append ("anonymous : ").append (event.getAnonymous ())
-                .toString ();
-    }
+    
 
 }

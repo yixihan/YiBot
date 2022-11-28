@@ -60,7 +60,7 @@ public class GoodImagePlugin {
         String message;
         // key 已经用完
         if (!hasToken (event.getGroupId ())) {
-            message = CQCodeUtils.extracted (event.getSender ().getUserId (), CQCodeEnums.AT) + "别冲啦, 对弟弟好点儿(￣_￣|||)";
+            message = CQCodeUtils.extracted (event.getSender ().getUserId (), CQCodeEnums.at) + "别冲啦, 对弟弟好点儿(￣_￣|||)";
             bot.sendGroupMsg (event.getGroupId (), message, false);
         }
         String[] splits = event.getMessage ().split (" ");
@@ -69,22 +69,22 @@ public class GoodImagePlugin {
 
         if (msgList == null) {
             // 没有搜到 setu
-            message = CQCodeUtils.extracted (event.getSender ().getUserId (), CQCodeEnums.AT) + "搜不到" + tag + ", 似乎不能涩涩了捏〒▽〒";
+            message = CQCodeUtils.extracted (event.getSender ().getUserId (), CQCodeEnums.at) + "搜不到" + tag + ", 似乎不能涩涩了捏〒▽〒";
             bot.sendGroupMsg (event.getGroupId (), message, false);
         } else {
             // 搜到色图
-            message = CQCodeUtils.extracted (msgList.get (0), CQCodeEnums.IMAGE);
+            message = CQCodeUtils.extracted (msgList.get (0), CQCodeEnums.image);
             msgList.add (message);
             msgList.remove (0);
             List<Map<String, Object>> forwardMsg = ShiroUtils.generateForwardMsg (Long.parseLong (event.getSender ().getUserId ()), event.getSender ().getNickname (), msgList);
             ActionData<MsgId> actionData = bot.sendGroupForwardMsg (event.getGroupId (), forwardMsg);
-            if (actionData == null && actionData.getRetCode () > 1) {
+            if (actionData == null || actionData.getRetCode () > 1) {
                 // 如果消息未发送成功
-                message = CQCodeUtils.extracted (event.getSender ().getUserId (), CQCodeEnums.AT) + "图片被风控捏(´。＿。｀)";
+                message = CQCodeUtils.extracted (event.getSender ().getUserId (), CQCodeEnums.at) + "图片被风控捏(´。＿。｀)";
                 bot.sendGroupMsg (event.getGroupId (), message, false);
             } else {
                 // 如果消息发送成功
-                message = CQCodeUtils.extracted (event.getSender ().getUserId (), CQCodeEnums.AT) + "可以涩涩ヾ(≧▽≦*)o";
+                message = CQCodeUtils.extracted (event.getSender ().getUserId (), CQCodeEnums.at) + "可以涩涩ヾ(≧▽≦*)o";
                 bot.sendGroupMsg (event.getGroupId (), message, false);
                 // key - 1
                 getToken (event.getGroupId ());

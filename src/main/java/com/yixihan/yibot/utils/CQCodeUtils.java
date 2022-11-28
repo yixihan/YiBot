@@ -36,9 +36,9 @@ public class CQCodeUtils {
         MsgChainBean msb = new MsgChainBean ();
         msb.setType (type.getType ());
         HashMap<String, String> map = new HashMap<> ();
-        if (CQCodeEnums.IMAGE.equals (type) || CQCodeEnums.VIDEO.equals (type)) {
+        if (CQCodeEnums.image.equals (type) || CQCodeEnums.video.equals (type)) {
             map.put ("file", val);
-        } else if (CQCodeEnums.AT.equals (type)) {
+        } else if (CQCodeEnums.at.equals (type) || CQCodeEnums.poke.equals (type)) {
             map.put ("qq", val);
         }
         msb.setData (map);

@@ -7,6 +7,7 @@ import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import com.yixihan.yibot.constant.PatternConstants;
 import org.junit.jupiter.api.Test;
+import org.quartz.CronExpression;
 
 import javax.annotation.Nullable;
 
@@ -62,7 +63,15 @@ public class MatcherTest {
         System.out.println (testStr2.matches (pattern));
         System.out.println (testStr3.matches (pattern));
     }
-
+    
+    @Test
+    public void test7() {
+        String tests = "0/2 * * * * ? *";
+        System.out.println (CronExpression.isValidExpression (tests));
+    
+    }
+    
+    
     @Test
     public void testGetImage() {
         System.out.println (getImage (null));
