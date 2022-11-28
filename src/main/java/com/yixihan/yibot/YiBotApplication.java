@@ -1,5 +1,6 @@
 package com.yixihan.yibot;
 
+import cn.hutool.cron.CronUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -32,6 +33,8 @@ public class YiBotApplication {
         Environment env = springApplication.run(args).getEnvironment();
         log.info("yibot server has started : {}, CPU core : {}",
                 Arrays.toString(env.getActiveProfiles()), Runtime.getRuntime().availableProcessors());
+    
+        CronUtil.start ();
     }
 
 }

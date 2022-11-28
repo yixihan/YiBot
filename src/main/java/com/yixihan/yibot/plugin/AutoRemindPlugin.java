@@ -156,10 +156,9 @@ public class AutoRemindPlugin extends BotPlugin {
      * @param message 提醒内容
      */
     private void addAutoRemind(@NotNull Bot bot, Long userId, String corn, String message) {
-        CronUtil.schedule (corn, (Task) () -> bot.sendPrivateMsg (userId, message, false));
+        CronUtil.schedule (userId + corn, corn, (Task) () -> bot.sendPrivateMsg (userId, message, false));
         // 支持秒级别定时任务
         CronUtil.setMatchSecond (true);
-        CronUtil.start ();
     }
     
     private void delAutoRemind(Long userId, String corn) {
@@ -180,7 +179,8 @@ public class AutoRemindPlugin extends BotPlugin {
     @Scheduled(cron = "0 0 0 * * ?")
     public void initAutoRemind() {
         Bot bot = getBot ();
-        CronUtil.stop ();
+        
+        CronUtil.restart ();
         
         log.info (String.valueOf (bot.getSelfId ()));
         
