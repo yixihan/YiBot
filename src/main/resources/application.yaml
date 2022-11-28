@@ -35,6 +35,7 @@ shiro:
   plugin-list:
     - com.yixihan.yibot.plugin.PokePlugin
     - com.yixihan.yibot.plugin.AutoRemindPlugin
+    - com.yixihan.yibot.plugin.AutoApprovalPlugin
 
 management:
   endpoints:

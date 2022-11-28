@@ -1,20 +1,17 @@
 package com.yixihan.yibot;
 
 import cn.hutool.core.util.StrUtil;
-import cn.hutool.http.HttpException;
 import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpResponse;
-import cn.hutool.json.JSON;
-import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
+import com.mikuac.shiro.core.BotContainer;
 import com.yixihan.yibot.constant.GoodImageConstants;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.web.WebAppConfiguration;
 
 import javax.annotation.Resource;
-import java.util.List;
 
 @SpringBootTest
 @WebAppConfiguration
@@ -22,6 +19,9 @@ class YiBotApplicationTests {
 
     @Resource
     private GoodImageConstants constants;
+    
+    @Resource
+    private BotContainer botContainer;
 
     @Test
     void contextLoads() {
