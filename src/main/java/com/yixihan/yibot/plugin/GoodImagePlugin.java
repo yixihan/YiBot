@@ -1,5 +1,7 @@
 package com.yixihan.yibot.plugin;
 
+import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.thread.ExecutorBuilder;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpResponse;
@@ -28,11 +30,8 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.concurrent.TimeUnit;
+import java.util.*;
+import java.util.concurrent.*;
 
 /**
  * 色图插件
@@ -50,6 +49,16 @@ public class GoodImagePlugin {
 
     @Resource
     private RedisTemplate<String, Object> redisTemplate;
+    
+    private static final ExecutorService EXECUTOR;
+    
+    static {
+        EXECUTOR = ExecutorBuilder.create()
+                .setCorePoolSize(5)
+                .setMaxPoolSize(10)
+                .setWorkQueue(new LinkedBlockingQueue<> (100))
+                .build();
+    }
 
     @GroupMessageHandler(at = AtEnum.OFF, cmd = "^(色色|瑟瑟|涩涩).*$")
     public void getImage(@NotNull Bot bot, @NotNull GroupMessageEvent event) {
@@ -63,11 +72,20 @@ public class GoodImagePlugin {
             message = CQCodeUtils.extracted (event.getSender ().getUserId (), CQCodeEnums.at) + "别冲啦, 对弟弟好点儿(￣_￣|||)";
             bot.sendGroupMsg (event.getGroupId (), message, false);
         }
+    
         String[] splits = event.getMessage ().split (" ");
         String tag = splits.length >= 2 ? splits[1] : null;
-        List<String> msgList = getImage (tag);
-
-        if (msgList == null) {
+        Future<List<String>> result = EXECUTOR.submit (new ImageRun (tag));
+        List<String> msgList;
+        try {
+            msgList = result.get ();
+        } catch (InterruptedException | ExecutionException e) {
+            message = CQCodeUtils.extracted (event.getSender ().getUserId (), CQCodeEnums.at) + "出错了捏";
+            bot.sendGroupMsg (event.getGroupId (), message, false);
+            return;
+        }
+    
+        if (CollectionUtil.isEmpty (msgList)) {
             // 没有搜到 setu
             message = CQCodeUtils.extracted (event.getSender ().getUserId (), CQCodeEnums.at) + "搜不到" + tag + ", 似乎不能涩涩了捏〒▽〒";
             bot.sendGroupMsg (event.getGroupId (), message, false);
@@ -93,7 +111,10 @@ public class GoodImagePlugin {
     }
 
     private List<String> getImage(@Nullable String val) {
-        String body = JSONUtil.toJsonStr (new RequestBody (new String[]{val}));
+        String body = null;
+        if (val != null) {
+            body = JSONUtil.toJsonStr (new RequestBody (new String[]{val}));
+        }
         try {
             HttpResponse response = HttpRequest.post (constants.getUrl ()).header ("Content-Type", "application/json").body (body).execute ();
             if (response.isOk ()) {
@@ -106,6 +127,7 @@ public class GoodImagePlugin {
                     list.add ("pid : " + data.getStr ("pid"));
                     list.add ("uid : " + data.getStr ("uid"));
                     list.add ("tags : " + JSONUtil.parseArray (data.get ("tags")));
+                    
                     return list;
                 }
 
@@ -122,7 +144,7 @@ public class GoodImagePlugin {
      * <p>
      * 设置白名单群限流
      */
-    @Scheduled(cron = "0 * * * * ?")
+    @Scheduled(cron = "0 0 0 * * ?")
     @PostConstruct
     public void setnx() {
         for (String groupId : constants.getVal ().split (", ")) {
@@ -157,6 +179,23 @@ public class GoodImagePlugin {
     private boolean hasToken(Long groupId) {
         String key = String.format (constants.getSetnxKey (), groupId);
         return Integer.parseInt (Optional.ofNullable (redisTemplate.opsForValue ().get (key)).orElse ("-1").toString ()) >= 0;
+    }
+    
+    
+    class ImageRun implements Callable<List<String>> {
+    
+        private final String val;
+    
+        public ImageRun(String val) {
+            this.val = val;
+        }
+    
+        @Override
+        public List<String> call() throws Exception {
+            List<String> image = getImage (val);
+            log.info ("images : " + image);
+            return image;
+        }
     }
 
     @Data
