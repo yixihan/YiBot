@@ -95,7 +95,7 @@ public class AutoRemindPlugin extends BotPlugin {
         
         // 自动提醒 添加
         if (ADD.equals (splits[1]) && CronExpression.isValidExpression (corn)) {
-            saveAutoRemid (event.getUserId (), corn, autoMindMsg);
+            saveAutoRemind (event.getUserId (), corn, autoMindMsg);
             addAutoRemind (bot, event.getUserId (), corn, autoMindMsg);
             bot.sendGroupMsg (event.getGroupId (), message + "添加成功!", false);
             return MESSAGE_IGNORE;
@@ -114,7 +114,7 @@ public class AutoRemindPlugin extends BotPlugin {
     }
     
     private String autoRemindHelp() {
-        return "自动提醒 帮助系统\n" + "添加自动提醒 : 自动提醒 添加 <[corn表达式]> [提醒语句]\n" + "删除自动提醒 : 自动提醒 删除 <[corn表达式]>\n" + "查看自动提醒列表 : 自动提醒 列表\n" + "tip : corn表达式帮助(https://cron.qqe2.com/)";
+        return "自动提醒 帮助系统\n" + "添加自动提醒 : 自动提醒 添加 <cron表达式> [提醒语句]\n" + "删除自动提醒 : 自动提醒 删除 <cron表达式>\n" + "查看自动提醒列表 : 自动提醒 列表\n" + "tip : corn表达式帮助(https://cron.qqe2.com/)";
     }
     
     /**
@@ -124,7 +124,7 @@ public class AutoRemindPlugin extends BotPlugin {
      * @param corn    corn 表达式
      * @param message 提醒内容
      */
-    private void saveAutoRemid(Long userId, String corn, String message) {
+    private void saveAutoRemind(Long userId, String corn, String message) {
         String key = String.format ("autoRemind:%s", userId);
         redisTemplate.opsForHash ().put (key, corn, message);
         redisTemplate.opsForHash ().put ("autoRemind", String.valueOf (userId), String.valueOf (userId));
