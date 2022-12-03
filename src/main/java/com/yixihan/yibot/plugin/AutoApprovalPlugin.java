@@ -49,8 +49,9 @@ public class AutoApprovalPlugin extends BotPlugin {
         }
     
         initUserList (bot);
-        long count = memberList.stream ().filter (groupMemberInfoResp -> groupMemberInfoResp.getUserId () == event.getUserId ()).count ();
-        if (count > 0) {
+        if (memberList.stream ().anyMatch (
+                groupMemberInfoResp -> groupMemberInfoResp.getUserId () == event.getUserId ())
+        ) {
             bot.sendGroupMsg (event.getGroupId (), "是老朋友捏", false);
             bot.setGroupAddRequest (event.getFlag (), event.getSubType (), true, "");
         }

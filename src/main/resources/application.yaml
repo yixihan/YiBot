@@ -36,6 +36,7 @@ shiro:
     - com.yixihan.yibot.plugin.PokePlugin
     - com.yixihan.yibot.plugin.AutoRemindPlugin
     - com.yixihan.yibot.plugin.AutoApprovalPlugin
+    - com.yixihan.yibot.plugin.AutoAddRequestPlugin
 
 management:
   endpoints:
