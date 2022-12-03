@@ -3,6 +3,7 @@ package com.yixihan.yibot.plugin;
 import com.mikuac.shiro.core.Bot;
 import com.mikuac.shiro.core.BotPlugin;
 import com.mikuac.shiro.dto.action.common.ActionRaw;
+import com.mikuac.shiro.dto.action.response.FriendInfoResp;
 import com.mikuac.shiro.dto.action.response.GroupInfoResp;
 import com.mikuac.shiro.dto.action.response.GroupMemberInfoResp;
 import com.mikuac.shiro.dto.event.request.FriendAddRequestEvent;
@@ -47,16 +48,17 @@ public class AutoAddRequestPlugin extends BotPlugin {
     @Override
     public int onFriendAddRequest(@NotNull Bot bot, @NotNull FriendAddRequestEvent event) {
         log.info ("收到好友添加请求, userId : {}", event.getUserId ());
+        if (getBlackList ().stream ()
+                .anyMatch ((o) -> Long.parseLong (o.toString ()) == event.getUserId ())) {
+            log.info ("此人在黑名单中，拒绝加好友请求");
+            bot.setFriendAddRequest (event.getFlag (), false, null);
+            return MESSAGE_IGNORE;
+        }
         getGroupNumberList (bot);
         if (groupNumberIdList.stream ().anyMatch ((user) -> user.getUserId () == event.getUserId ())) {
             log.info ("是已在群的群友, 同意加好友请求");
             bot.setFriendAddRequest (event.getFlag (), true, null);
         } else {
-            if (getBlackList ().stream ()
-                    .anyMatch ((o) -> Long.parseLong (o.toString ()) == event.getUserId ())) {
-                log.info ("此人在黑名单中，拒绝加好友请求");
-                bot.setFriendAddRequest (event.getFlag (), false, null);
-            }
             log.info ("未知人物, 拒绝加好友请求");
             bot.setFriendAddRequest (event.getFlag (), false, null);
         }
@@ -78,12 +80,18 @@ public class AutoAddRequestPlugin extends BotPlugin {
             if ("failed".equals (actionRaw.getStatus ())) {
                 log.info ("已经被拉入群捏, 赶紧退出");
                 bot.setGroupLeave (event.getGroupId (), false);
-                // 顺带删除好友， 加入黑名单
-                bot.sendPrivateMsg (event.getUserId (), "乱拉小易入群, 大坏蛋, 进黑名单吧你!", false);
-                bot.deleteFriend (event.getUserId ());
+                List<FriendInfoResp> data = bot.getFriendList ().getData ();
+                FriendInfoResp friendInfo = data.stream ()
+                        .filter ((o) -> o.getUserId () == event.getUserId ()).findFirst ().orElse (null);
+                if (friendInfo == null) {
+                    log.info ("非好友, 不处理");
+                } else {
+                    log.info ("是好友, 删好友, 进黑名单");
+                    bot.sendPrivateMsg (event.getUserId (), "乱拉小易入群, 大坏蛋, 进黑名单吧你!", false);
+                    bot.deleteFriend (friendInfo.getUserId ());
+                }
                 addBlacklist (event.getUserId ());
             }
-            log.info ("actionRaw : {}", actionRaw);
         }
         return super.onGroupAddRequest (bot, event);
     }
