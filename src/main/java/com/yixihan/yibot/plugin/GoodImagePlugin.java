@@ -63,10 +63,12 @@ public class GoodImagePlugin {
     @GroupMessageHandler(at = AtEnum.OFF, cmd = "^(色色|瑟瑟|涩涩).*$")
     public void getImage(@NotNull Bot bot, @NotNull GroupMessageEvent event) {
         // 群号在非白名单内
+        String message;
         if (!constants.getVal ().contains (String.valueOf (event.getGroupId ()))) {
+            message = CQCodeUtils.extracted (event.getSender ().getUserId (), CQCodeEnums.at) + "不许涩涩！";
+            bot.sendGroupMsg (event.getGroupId (), message, false);
             return;
         }
-        String message;
         // key 已经用完
         if (!hasToken (event.getGroupId ())) {
             message = CQCodeUtils.extracted (event.getSender ().getUserId (), CQCodeEnums.at) + "别冲啦, 对弟弟好点儿(￣_￣|||)";
@@ -144,7 +146,7 @@ public class GoodImagePlugin {
      * <p>
      * 设置白名单群限流
      */
-    @Scheduled(cron = "0 0 0 * * ?")
+    @Scheduled(cron = "0 * * * * ?")
     @PostConstruct
     public void setnx() {
         for (String groupId : constants.getVal ().split (", ")) {
