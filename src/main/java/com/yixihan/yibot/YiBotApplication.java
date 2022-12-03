@@ -26,8 +26,6 @@ import java.util.Arrays;
 @SpringBootApplication
 public class YiBotApplication {
     
-
-
     public static void main(String[] args) {
         SpringApplication springApplication = new SpringApplication(YiBotApplication.class);
         Environment env = springApplication.run(args).getEnvironment();
