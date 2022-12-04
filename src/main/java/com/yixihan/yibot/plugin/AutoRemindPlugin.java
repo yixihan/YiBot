@@ -2,7 +2,6 @@ package com.yixihan.yibot.plugin;
 
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.cron.CronUtil;
-import cn.hutool.cron.task.Task;
 import com.mikuac.shiro.core.Bot;
 import com.mikuac.shiro.core.BotContainer;
 import com.mikuac.shiro.core.BotPlugin;
@@ -22,6 +21,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import static com.yixihan.yibot.constant.CommonConstants.*;
+import static com.yixihan.yibot.constant.NumberConstants.THREE;
+import static com.yixihan.yibot.constant.NumberConstants.TWO;
+
 /**
  * 自动提醒插件
  *
@@ -38,16 +41,6 @@ public class AutoRemindPlugin extends BotPlugin {
     @Resource
     private BotContainer botContainer;
     
-    private static final String HELP = "帮助";
-    
-    private static final String ADD = "添加";
-    
-    private static final String DEL = "删除";
-    
-    private static final String LIST = "列表";
-    
-    private static final String RELOAD = "刷新";
-    
     
     /**
      * 自动提醒
@@ -62,7 +55,7 @@ public class AutoRemindPlugin extends BotPlugin {
         
         String message = CQCodeUtils.extracted (event.getSender ().getUserId (), CQCodeEnums.at);
         
-        if (splits.length == 2 && LIST.equals (splits[1])) {
+        if (splits.length == TWO && LIST.equals (splits[1])) {
             // 自动提醒 列表
             Map<Object, Object> autoRemind = getAutoRemind (event.getUserId ());
             
@@ -78,15 +71,15 @@ public class AutoRemindPlugin extends BotPlugin {
             bot.sendGroupMsg (event.getGroupId (), message + sb, false);
             
             return MESSAGE_IGNORE;
-        } else if (splits.length == 2 && HELP.equals (splits[1])) {
+        } else if (splits.length == TWO && HELP.equals (splits[1])) {
             // 自动提醒 帮助
             bot.sendGroupMsg (event.getGroupId (), message + autoRemindHelp (), false);
             return MESSAGE_IGNORE;
-        } else if (splits.length == 2 && RELOAD.equals (splits[1])) {
+        } else if (splits.length == TWO && RELOAD.equals (splits[1])) {
             initAutoRemind ();
             bot.sendGroupMsg (event.getGroupId (), message + "刷新成功!", false);
             return MESSAGE_IGNORE;
-        } else if (splits.length < 3) {
+        } else if (splits.length < THREE) {
             return MESSAGE_IGNORE;
         }
         
@@ -156,7 +149,7 @@ public class AutoRemindPlugin extends BotPlugin {
      * @param message 提醒内容
      */
     private void addAutoRemind(@NotNull Bot bot, Long userId, String corn, String message) {
-        CronUtil.schedule (userId + corn, corn, (Task) () -> bot.sendPrivateMsg (userId, message, false));
+        CronUtil.schedule (userId + corn, corn, () -> bot.sendPrivateMsg (userId, message, false));
         // 支持秒级别定时任务
         CronUtil.setMatchSecond (true);
     }

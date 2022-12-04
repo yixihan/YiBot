@@ -114,15 +114,21 @@ public class GoodImagePlugin {
 
     private List<String> getImage(@Nullable String val) {
         String body = null;
+        String error = "error";
         if (val != null) {
             body = JSONUtil.toJsonStr (new RequestBody (new String[]{val}));
         }
         try {
-            HttpResponse response = HttpRequest.post (constants.getUrl ()).header ("Content-Type", "application/json").body (body).execute ();
+            HttpResponse response = HttpRequest
+                    .post (constants.getUrl ())
+                    .header ("Content-Type", "application/json")
+                    .body (body)
+                    .execute ();
+            
             if (response.isOk ()) {
 
                 JSONObject obj = JSONUtil.parseObj (response.body ());
-                if (StrUtil.isBlank (obj.getStr ("error"))) {
+                if (StrUtil.isBlank (obj.getStr (error))) {
                     JSONObject data = JSONUtil.parseObj (JSONUtil.parseArray (obj.get ("data")).get (0));
                     List<String> list = new ArrayList<> ();
                     list.add (JSONUtil.parseObj (data.get ("urls")).getStr ("original"));
@@ -149,7 +155,8 @@ public class GoodImagePlugin {
     @Scheduled(cron = "0 * * * * ?")
     @PostConstruct
     public void setnx() {
-        for (String groupId : constants.getVal ().split (", ")) {
+        String splitKey = ", ";
+        for (String groupId : constants.getVal ().split (splitKey)) {
             String key = String.format (constants.getSetnxKey (), groupId);
             redisTemplate.opsForValue ().set (key, constants.getSetnxCnt (), constants.getSetnxTime (), TimeUnit.MINUTES);
         }
@@ -160,17 +167,12 @@ public class GoodImagePlugin {
      *
      * @param groupId 群号
      */
-    private synchronized boolean getToken(Long groupId) {
+    private synchronized void getToken(Long groupId) {
         String key = String.format (constants.getSetnxKey (), groupId);
         int cnt = Integer.parseInt (Optional.ofNullable (redisTemplate.opsForValue ().get (key)).orElse ("-1").toString ());
-
-        if (cnt <= 0) {
-            return false;
-        } else {
-            cnt--;
-            redisTemplate.opsForValue ().set (key, cnt);
-            return true;
-        }
+        cnt--;
+        redisTemplate.opsForValue ().set (key, cnt);
+        
     }
 
     /**
@@ -193,7 +195,7 @@ public class GoodImagePlugin {
         }
     
         @Override
-        public List<String> call() throws Exception {
+        public List<String> call() {
             List<String> image = getImage (val);
             log.info ("images : " + image);
             return image;
@@ -203,7 +205,7 @@ public class GoodImagePlugin {
     @Data
     @AllArgsConstructor
     @NoArgsConstructor
-    class RequestBody {
+    static class RequestBody {
 
         String[] tag;
 

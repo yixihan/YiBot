@@ -18,6 +18,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static com.yixihan.yibot.constant.CommonConstants.INVITE;
+import static com.yixihan.yibot.constant.CommonConstants.MASTER_ID;
+
 /**
  * 自动处理请求插件
  *
@@ -30,10 +33,6 @@ import java.util.stream.Collectors;
 @Slf4j
 @Component
 public class AutoAddRequestPlugin extends BotPlugin {
-    
-    private static final String INVITE = "invite";
-    
-    private static final Long MASTER_ID = 3113788997L;
     
     List<Long> groupIdList = new ArrayList<> ();
     
@@ -67,6 +66,7 @@ public class AutoAddRequestPlugin extends BotPlugin {
     
     @Override
     public int onGroupAddRequest(@NotNull Bot bot, @NotNull GroupAddRequestEvent event) {
+        String failed = "failed";
         if (!INVITE.equals (event.getSubType ())) {
             return MESSAGE_IGNORE;
         }
@@ -77,7 +77,7 @@ public class AutoAddRequestPlugin extends BotPlugin {
         } else {
             log.info ("未知人的要求, 不同意");
             ActionRaw actionRaw = bot.setGroupAddRequest (event.getFlag (), event.getSubType (), false, "易老师给我说, 不能同意陌生人的邀请捏");
-            if ("failed".equals (actionRaw.getStatus ())) {
+            if (failed.equals (actionRaw.getStatus ())) {
                 log.info ("已经被拉入群捏, 赶紧退出");
                 bot.setGroupLeave (event.getGroupId (), false);
                 List<FriendInfoResp> data = bot.getFriendList ().getData ();

@@ -23,20 +23,20 @@ import java.util.Random;
 @Component
 public class PokePlugin extends BotPlugin {
     
-    private static final Map<Integer, String> messageMap = new HashMap<> ();
+    private static final Map<Integer, String> MESSAGE_MAP = new HashMap<> ();
     
-    private static final Random rd = new Random ();
+    private static final Random RD = new Random ();
     
     private static final Integer MAX_CNT = 6;
     
     
     static {
-        messageMap.put (0, "憋载这理发店(╬▔皿▔)╯");
-        messageMap.put (1, "戳坏了你得赔哦( ͡• ͜ʖ ͡• )");
-        messageMap.put (2, "再戳我就生气啦ヽ（≧□≦）ノ");
-        messageMap.put (3, "这么喜欢戳我,一定是因为喜欢易老师吧(￣_,￣ )");
-        messageMap.put (4, "再戳我就祝你期末考59分<( ￣^￣)(θ(θ☆( >_<<( ￣^￣)(θ(θ☆( >_<");
-        messageMap.put (5, "请到易老师床上发癫捏");
+        MESSAGE_MAP.put (0, "憋载这理发店(╬▔皿▔)╯");
+        MESSAGE_MAP.put (1, "戳坏了你得赔哦( ͡• ͜ʖ ͡• )");
+        MESSAGE_MAP.put (2, "再戳我就生气啦ヽ（≧□≦）ノ");
+        MESSAGE_MAP.put (3, "这么喜欢戳我,一定是因为喜欢易老师吧(￣_,￣ )");
+        MESSAGE_MAP.put (4, "再戳我就祝你期末考59分<( ￣^￣)(θ(θ☆( >_<<( ￣^￣)(θ(θ☆( >_<");
+        MESSAGE_MAP.put (5, "请到易老师床上发癫捏");
     }
     
     /**
@@ -81,6 +81,6 @@ public class PokePlugin extends BotPlugin {
      * 获取随机消息
      */
     private String getRandomMessage () {
-        return messageMap.get (rd.nextInt (MAX_CNT));
+        return MESSAGE_MAP.get (RD.nextInt (MAX_CNT));
     }
 }

@@ -28,7 +28,7 @@ public class RepeatPlugin {
     private final Map<Long, RepeatNode> repeatNodeMap = new ConcurrentHashMap<> ();
 
     @GroupMessageHandler(at = AtEnum.OFF)
-    public void GroupRepeatMessage(@NotNull Bot bot, @NotNull GroupMessageEvent event) {
+    public void groupRepeatMessage(@NotNull Bot bot, @NotNull GroupMessageEvent event) {
         RepeatNode node = repeatNodeMap.getOrDefault (event.getGroupId (), new RepeatNode ());
 
         if (StrUtil.isBlank (node.getLastMessage ())) {
