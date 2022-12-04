@@ -37,6 +37,7 @@ shiro:
     - com.yixihan.yibot.plugin.AutoRemindPlugin
     - com.yixihan.yibot.plugin.AutoApprovalPlugin
     - com.yixihan.yibot.plugin.AutoAddRequestPlugin
+    - com.yixihan.yibot.plugin.WithdrawRecordPlugin
 
 management:
   endpoints:

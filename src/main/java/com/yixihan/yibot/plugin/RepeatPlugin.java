@@ -24,7 +24,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @Shiro
 @Component
 public class RepeatPlugin {
-    private static final int MAX_CNT = 3;
+    private static final int MAX_CNT = 4;
     private final Map<Long, RepeatNode> repeatNodeMap = new ConcurrentHashMap<> ();
 
     @GroupMessageHandler(at = AtEnum.OFF)

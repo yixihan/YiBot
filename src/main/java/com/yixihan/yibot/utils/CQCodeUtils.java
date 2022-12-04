@@ -3,9 +3,13 @@ package com.yixihan.yibot.utils;
 import com.mikuac.shiro.bean.MsgChainBean;
 import com.mikuac.shiro.common.utils.ShiroUtils;
 import com.yixihan.yibot.enums.CQCodeEnums;
+import com.yixihan.yibot.pojo.MessageNode;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * CQ code 工具类
@@ -43,6 +47,29 @@ public class CQCodeUtils {
         }
         msb.setData (map);
         return ShiroUtils.jsonToCode (msb);
+    }
+    
+    /**
+     * 组装合并转发消息
+     */
+    public static List<Map<String, Object>> generateForwardMsg(List<MessageNode> contents) {
+        ArrayList<Map<String, Object>> nodes = new ArrayList<> ();
+        contents.forEach((msg) -> {
+            HashMap<String, Object> node = new HashMap<String, Object>(16) {
+                {
+                    this.put("type", "node");
+                    this.put("data", new HashMap<String, Object>(16) {
+                        {
+                            this.put("name", msg.getUserName ());
+                            this.put("uin", msg.getUserId ());
+                            this.put("content", msg.getMessage ());
+                        }
+                    });
+                }
+            };
+            nodes.add(node);
+        });
+        return nodes;
     }
 
 
