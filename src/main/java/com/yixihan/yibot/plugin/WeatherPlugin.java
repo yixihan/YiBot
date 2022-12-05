@@ -11,6 +11,7 @@ import com.mikuac.shiro.core.BotPlugin;
 import com.mikuac.shiro.dto.event.message.GroupMessageEvent;
 import com.yixihan.yibot.enums.CQCodeEnums;
 import com.yixihan.yibot.pojo.NowWeather;
+import com.yixihan.yibot.pojo.WeatherCity;
 import com.yixihan.yibot.utils.CQCodeUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
@@ -72,21 +73,27 @@ public class WeatherPlugin extends BotPlugin {
                                        @NotNull GroupMessageEvent event,
                                        String[] queryParams) {
         int len = queryParams.length;
-        String locationId;
+        WeatherCity city;
         if (len == THREE) {
             // 天气查询 实时天气 xxx
-            locationId = citySearch (null, queryParams[2]);
+            city = citySearch (null, queryParams[2]);
         } else if (len == FOUR) {
-            locationId = citySearch (queryParams[2], queryParams[3]);
+            city = citySearch (queryParams[2], queryParams[3]);
         } else {
             log.warn ("天气查询-实时天气查询-错误传参");
             messageOutput (bot, event, "错误传参");
             return;
         }
     
+        if (city == null) {
+            log.warn ("天气查询-实时天气查询-城市搜索不到");
+            messageOutput (bot, event, "城市搜索不到");
+            return;
+        }
+    
         String url = REAL_TIME_WEATHER_URL
                 + "?key=" + KEY
-                + "&location=" + locationId;
+                + "&location=" + city.getLocationId ();
     
         HttpResponse execute = HttpRequest.get (url).execute ();
         if (execute.isOk ()) {
@@ -97,6 +104,7 @@ public class WeatherPlugin extends BotPlugin {
                 return;
             }
             NowWeather data = JSONUtil.toBean (body.getStr ("now"), NowWeather.class);
+            data.setCity (city);
             messageOutput (bot, event, data.toString ());
         } else {
             log.warn ("天气查询-实时天气查询-天气查询失败");
@@ -138,7 +146,7 @@ public class WeatherPlugin extends BotPlugin {
      * @param location 查询地区的名称
      * @return locationId
      */
-    private String citySearch (@Nullable String adm, @NotNull String location) {
+    private WeatherCity citySearch (@Nullable String adm, @NotNull String location) {
         String url = LOCATION_URL
                 + "?key=" + KEY
                 + (StrUtil.isEmpty (adm) ? "" : "&adm=" + adm)
@@ -154,10 +162,18 @@ public class WeatherPlugin extends BotPlugin {
             if (jsonArray.isEmpty ()) {
                 return null;
             }
-            return JSONUtil.parseObj (jsonArray.get (0)).getStr ("id");
-    
-        }
+            WeatherCity city = new WeatherCity ();
+            JSONObject data = JSONUtil.parseObj (jsonArray.get (0));
+            city.setLocationId (data.getStr ("id"));
+            city.setCityName (data.getStr ("country") + "-"
+                    + data.getStr ("adm1") + "-"
+                    + data.getStr ("adm2") + "-"
+                    + data.getStr ("name"));
         
+            return city;
+        
+        }
+    
         return null;
     }
     
