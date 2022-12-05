@@ -57,6 +57,9 @@ public class WeatherPlugin extends BotPlugin {
         } else if (WEATHER_QUERY_SECOND[2].equals (queryParams[1])) {
             // 逐小时天气查询
             hourlyWeatherQuery (bot, event, queryParams);
+        } else if (WEATHER_QUERY_SECOND[3].equals (queryParams[1])) {
+            // 帮助菜单
+            helperWeather (bot, event);
         } else {
             messageOutput (bot, event, "错误指令");
         }
@@ -251,6 +254,27 @@ public class WeatherPlugin extends BotPlugin {
             log.warn ("天气查询-实时天气查询-天气查询失败");
             messageOutput (bot, event, "天气查询失败");
         }
+    }
+    
+    /**
+     * 天气查询-帮助
+     *
+     * @param bot bot
+     * @param event event
+     */
+    private void helperWeather(Bot bot, GroupMessageEvent event) {
+        String message = CQCodeUtils.extracted (
+                event.getSender ().getUserId (),
+                CQCodeEnums.at)
+                + "天气查询 帮助系统\n"
+                + "实时天气查询 :\n"
+                + "天气查询 实时天气 [城市的上级行政区划] 地区\n"
+                + "未来天气查询 :\n"
+                + "天气查询 未来天气 [城市的上级行政区划] 地区 (3/7)"
+                + "逐小时天气查询 : \n"
+                + "天气查询 逐小时天气 [城市的上级行政区划] 地区 (24)\n"
+                + "tips : [] 为可选参数, () 为必选参数";
+        bot.sendGroupMsg (event.getGroupId (), message, false);
     }
     
     

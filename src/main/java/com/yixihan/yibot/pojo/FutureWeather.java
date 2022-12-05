@@ -79,32 +79,28 @@ public class FutureWeather {
     private String cloud;
     
     public String toString () {
-        StringBuilder sb = new StringBuilder ();
-        sb.append ("预报日期:").append (fxDate).append ("\n")
-                .append ("日出时间 : ").append (sunrise).append ("\n")
-                .append ("日落时间 : ").append (sunset).append ("\n")
-                .append ("月升时间 : ").append (moonrise).append ("\n")
-                .append ("月落时间 : ").append (moonset).append ("\n")
-                .append ("月相名称 : ").append (moonPhase).append ("\n")
-                .append ("当天最高温度 : ").append (tempMax).append (" 度\n")
-                .append ("当天最低温度 : ").append (tempMin).append (" 度\n")
-                .append ("白天天气状况 : ").append (textDay).append ("\n")
-                .append ("晚间天气状况 : ").append (textNight).append ("\n")
-                .append ("白天风向 : ").append (windDirDay).append ("\n")
-                .append ("白天风力等级 : ").append (windScaleDay).append ("\n")
-                .append ("白天风速 : ").append (windSpeedDay).append (" 公里/小时\n")
-                .append ("夜间风向 : ").append (windDirNight).append ("\n")
-                .append ("夜间风力等级 : ").append (windScaleNight).append ("\n")
-                .append ("夜间风速 : ").append (windSpeedNight).append (" 公里/小时\n")
-                .append ("当天总降水量 : ").append (precip).append (" 毫米\n")
-                .append ("紫外线强度指数 : ").append (uvIndex).append ("\n")
-                .append ("相对湿度 : ").append (humidity).append (" %\n")
-                .append ("大气压强 : ").append (pressure).append (" 百帕\n")
-                .append ("能见度 : ").append (vis).append (" 公里\n")
-                .append ("云量 : ").append (cloud);
-                
-                
-        return sb.toString ();
+        return "预报日期:" + fxDate + "\n"
+                + "日出时间 : " + sunrise + "\n"
+                + "日落时间 : " + sunset + "\n"
+                + "月升时间 : " + moonrise + "\n"
+                + "月落时间 : " + moonset + "\n"
+                + "月相名称 : " + moonPhase + "\n"
+                + "当天最高温度 : " + tempMax + " 度\n"
+                + "当天最低温度 : " + tempMin + " 度\n"
+                + "白天天气状况 : " + textDay + "\n"
+                + "晚间天气状况 : " + textNight + "\n"
+                + "白天风向 : " + windDirDay + "\n"
+                + "白天风力等级 : " + windScaleDay + "\n"
+                + "白天风速 : " + windSpeedDay + " 公里/小时\n"
+                + "夜间风向 : " + windDirNight + "\n"
+                + "夜间风力等级 : " + windScaleNight + "\n"
+                + "夜间风速 : " + windSpeedNight + " 公里/小时\n"
+                + "当天总降水量 : " + precip + " 毫米\n"
+                + "紫外线强度指数 : " + uvIndex + "\n"
+                + "相对湿度 : " + humidity + " %\n"
+                + "大气压强 : " + pressure + " 百帕\n"
+                + "能见度 : " + vis + " 公里\n"
+                + "云量 : " + cloud;
     }
     
 }

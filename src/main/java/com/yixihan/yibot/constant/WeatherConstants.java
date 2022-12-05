@@ -41,7 +41,7 @@ public class WeatherConstants {
     /**
      * 查询 - 2
      */
-    public static final String[] WEATHER_QUERY_SECOND = {"实时天气", "未来天气", "逐小时天气"};
+    public static final String[] WEATHER_QUERY_SECOND = {"实时天气", "未来天气", "逐小时天气", "帮助"};
     
     /**
      * 逐小时天气 - 参数
