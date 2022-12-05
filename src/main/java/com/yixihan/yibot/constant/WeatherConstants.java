@@ -16,7 +16,7 @@ public class WeatherConstants {
     /**
      * 未来天气预报 - (3, 7, 10, 15, 30)
      */
-    public static final String DAILY_WEATHER_URL = "https://devapi.qweather.com/v7/weather/%sd";
+    public static final String FUTURE_WEATHER_URL = "https://devapi.qweather.com/v7/weather/%sd";
     
     /**
      * 逐小时天气预报 - (24, 72, 168)
@@ -46,11 +46,11 @@ public class WeatherConstants {
     /**
      * 逐小时天气 - 参数
      */
-    public static final Integer[] HOURLY_WEATHER_PARAMS = {24, 72, 168};
+    public static final Integer[] HOURLY_WEATHER_PARAMS = {24};
     
     /**
      * 未来天气 - 参数
      */
-    public static final Integer[] DAILY_WEATHER_PARAMS = {3, 7, 10, 15, 30};
+    public static final Integer[] FUTURE_WEATHER_PARAMS = {3, 7};
     
 }

@@ -6,9 +6,8 @@ import cn.hutool.http.HttpResponse;
 import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
-import com.mikuac.shiro.core.Bot;
-import com.mikuac.shiro.dto.event.message.GroupMessageEvent;
 import com.yixihan.yibot.constant.PatternConstants;
+import com.yixihan.yibot.pojo.HourlyWeather;
 import com.yixihan.yibot.pojo.NowWeather;
 import com.yixihan.yibot.pojo.WeatherCity;
 import lombok.extern.slf4j.Slf4j;
@@ -18,8 +17,7 @@ import org.quartz.CronExpression;
 
 import javax.annotation.Nullable;
 
-import static com.yixihan.yibot.constant.NumberConstants.FOUR;
-import static com.yixihan.yibot.constant.NumberConstants.THREE;
+import static com.yixihan.yibot.constant.NumberConstants.*;
 import static com.yixihan.yibot.constant.WeatherConstants.*;
 
 /**
@@ -180,4 +178,25 @@ public class MatcherTest {
         }
     }
 
+    @Test
+    public void test10 () {
+        String json = "{"
+                + "\"fxTime\": \"2022-12-06T11:00+08:00\",\n"
+                + "\"temp\": \"8\",\n"
+                + "\"icon\": \"101\",\n"
+                + "\"text\": \"多云\",\n"
+                + "\"wind360\": \"41\",\n"
+                + "\"windDir\": \"东北风\",\n"
+                + "\"windScale\": \"1-2\",\n"
+                + "\"windSpeed\": \"9\",\n"
+                + "\"humidity\": \"60\",\n"
+                + "\"pop\": \"7\",\n"
+                + "\"precip\": \"0.0\",\n"
+                + "\"pressure\": \"963\",\n"
+                + "\"cloud\": \"100\",\n"
+                + "\"dew\": \"0\"\n"
+                + "}";
+        HourlyWeather hourlyWeather = JSONUtil.toBean (json, HourlyWeather.class);
+        System.out.println (hourlyWeather.toString ());
+    }
 }

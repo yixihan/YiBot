@@ -10,18 +10,19 @@ import com.mikuac.shiro.core.Bot;
 import com.mikuac.shiro.core.BotPlugin;
 import com.mikuac.shiro.dto.event.message.GroupMessageEvent;
 import com.yixihan.yibot.enums.CQCodeEnums;
-import com.yixihan.yibot.pojo.NowWeather;
-import com.yixihan.yibot.pojo.WeatherCity;
+import com.yixihan.yibot.pojo.*;
 import com.yixihan.yibot.utils.CQCodeUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 
-import static com.yixihan.yibot.constant.NumberConstants.FOUR;
-import static com.yixihan.yibot.constant.NumberConstants.THREE;
+import static com.yixihan.yibot.constant.NumberConstants.*;
 import static com.yixihan.yibot.constant.WeatherConstants.*;
 
 /**
@@ -50,7 +51,7 @@ public class WeatherPlugin extends BotPlugin {
         if (WEATHER_QUERY_SECOND[0].equals (queryParams[1])) {
             // 实时天气查询
             realTimeWeatherQuery (bot, event, queryParams);
-        } else if (WEATHER_QUERY_SECOND[1].equals (queryParams[2])) {
+        } else if (WEATHER_QUERY_SECOND[1].equals (queryParams[1])) {
             // 未来天气查询
             futureWeatherQuery (bot, event, queryParams);
         } else if (WEATHER_QUERY_SECOND[2].equals (queryParams[1])) {
@@ -122,7 +123,64 @@ public class WeatherPlugin extends BotPlugin {
     private void futureWeatherQuery (@NotNull Bot bot,
                                      @NotNull GroupMessageEvent event,
                                      String[] queryParams) {
-        messageOutput (bot, event, "还没有做捏, 别着急啦!");
+        int len = queryParams.length;
+        WeatherCity city;
+        if (len == FOUR) {
+            // 天气查询 实时天气 xxx
+            city = citySearch (null, queryParams[2]);
+        } else if (len == FIVE) {
+            city = citySearch (queryParams[2], queryParams[3]);
+        } else {
+            log.warn ("天气查询-实时天气查询-错误传参");
+            messageOutput (bot, event, "错误传参");
+            return;
+        }
+    
+        if (city == null) {
+            log.warn ("天气查询-实时天气查询-城市搜索不到");
+            messageOutput (bot, event, "城市搜索不到");
+            return;
+        }
+        if (Arrays.stream (FUTURE_WEATHER_PARAMS).noneMatch ((o) -> o.toString ().equals (queryParams[queryParams.length - 1]))) {
+            log.warn ("天气查询-实时天气查询-查询天数错误");
+            messageOutput (bot, event, "查询天数错误");
+            return;
+        }
+    
+        String url = String.format (FUTURE_WEATHER_URL, queryParams[queryParams.length - 1])
+                + "?key=" + KEY
+                + "&location=" + city.getLocationId ();
+    
+        HttpResponse execute = HttpRequest.get (url).execute ();
+        if (execute.isOk ()) {
+            JSONObject body = JSONUtil.parseObj (execute.body ());
+            if (!"200".equals (body.getStr ("code"))) {
+                log.warn ("天气查询-实时天气查询-天气查询失败");
+                messageOutput (bot, event, "天气查询失败");
+                return;
+            }
+            List<FutureWeather> dataList = JSONUtil.toList (JSONUtil.parseArray (body.getStr ("daily")), FutureWeather.class);
+            List<MessageNode> messageList = new ArrayList<> ();
+            MessageNode node = new MessageNode ();
+            node.setMessage ("下面是 " + city.getCityName () + " 未来 " + queryParams[queryParams.length - 1] + " 天天气预报");
+            node.setUserId (event.getUserId ());
+            node.setUserName (event.getSender ().getNickname ());
+            messageList.add (node);
+            for (FutureWeather data : dataList) {
+                node = new MessageNode ();
+                node.setMessage (data.toString ());
+                node.setUserId (event.getUserId ());
+                node.setUserName (event.getSender ().getNickname ());
+                messageList.add (node);
+            }
+            List<Map<String, Object>> forwardMsg = CQCodeUtils.generateForwardMsg (messageList);
+            bot.sendGroupForwardMsg (event.getGroupId (), forwardMsg);
+    
+    
+        } else {
+            log.warn ("天气查询-实时天气查询-天气查询失败");
+            messageOutput (bot, event, "天气查询失败");
+        }
     }
     
     /**
@@ -135,7 +193,64 @@ public class WeatherPlugin extends BotPlugin {
     private void hourlyWeatherQuery (@NotNull Bot bot,
                                      @NotNull GroupMessageEvent event,
                                      String[] queryParams) {
-        messageOutput (bot, event, "还没有做捏, 别着急啦!");
+        int len = queryParams.length;
+        WeatherCity city;
+        if (len == FOUR) {
+            // 天气查询 实时天气 xxx
+            city = citySearch (null, queryParams[2]);
+        } else if (len == FIVE) {
+            city = citySearch (queryParams[2], queryParams[3]);
+        } else {
+            log.warn ("天气查询-实时天气查询-错误传参");
+            messageOutput (bot, event, "错误传参");
+            return;
+        }
+    
+        if (city == null) {
+            log.warn ("天气查询-实时天气查询-城市搜索不到");
+            messageOutput (bot, event, "城市搜索不到");
+            return;
+        }
+        if (Arrays.stream (HOURLY_WEATHER_PARAMS).noneMatch ((o) -> o.toString ().equals (queryParams[queryParams.length - 1]))) {
+            log.warn ("天气查询-实时天气查询-查询天数错误");
+            messageOutput (bot, event, "查询天数错误");
+            return;
+        }
+    
+        String url = String.format (HOURLY_WEATHER_URL, queryParams[queryParams.length - 1])
+                + "?key=" + KEY
+                + "&location=" + city.getLocationId ();
+    
+        HttpResponse execute = HttpRequest.get (url).execute ();
+        if (execute.isOk ()) {
+            JSONObject body = JSONUtil.parseObj (execute.body ());
+            if (!"200".equals (body.getStr ("code"))) {
+                log.warn ("天气查询-实时天气查询-天气查询失败");
+                messageOutput (bot, event, "天气查询失败");
+                return;
+            }
+            List<HourlyWeather> dataList = JSONUtil.toList (JSONUtil.parseArray (body.getStr ("hourly")), HourlyWeather.class);
+            List<MessageNode> messageList = new ArrayList<> ();
+            MessageNode node = new MessageNode ();
+            node.setMessage ("下面是 " + city.getCityName () + " 未来 " + queryParams[queryParams.length - 1] + " 小时天气预报");
+            node.setUserId (event.getUserId ());
+            node.setUserName (event.getSender ().getNickname ());
+            messageList.add (node);
+            for (HourlyWeather data : dataList) {
+                node = new MessageNode ();
+                node.setMessage (data.toString ());
+                node.setUserId (event.getUserId ());
+                node.setUserName (event.getSender ().getNickname ());
+                messageList.add (node);
+            }
+            List<Map<String, Object>> forwardMsg = CQCodeUtils.generateForwardMsg (messageList);
+            bot.sendGroupForwardMsg (event.getGroupId (), forwardMsg);
+        
+        
+        } else {
+            log.warn ("天气查询-实时天气查询-天气查询失败");
+            messageOutput (bot, event, "天气查询失败");
+        }
     }
     
     

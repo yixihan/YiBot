@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 /**
- * description
+ * 实时天气
  *
  * @author yixihan
  * @date 2022/12/5 16:35
@@ -40,7 +40,7 @@ public class NowWeather {
     @JSONField(name = "humidity", label = "相对湿度")
     private String humidity;
     
-    @JSONField(name = "precip", label = "数据观测时间")
+    @JSONField(name = "precip", label = "当前小时累计降水量")
     private String precip;
     
     @JSONField(name = "pressure", label = "大气压强")
@@ -59,19 +59,19 @@ public class NowWeather {
     
     public String toString() {
         LocalDateTime date = LocalDateTime.parse (obsTime, DateTimeFormatter.ISO_OFFSET_DATE_TIME);
-        return "下面是 " + city.getCityName () + " 实时天气情况" + "\n"
-                + "温度:" + temp + " 度" + "\n"
-                + "体感温度:" + feelsLike + " 度" + "\n"
-                + "天气状况:" + text + "\n"
-                + "风向:" + windDir + "\n"
-                + "风力等级:" + windScale + "\n"
-                + "风速:" + windSpeed + " 公里/小时" + "\n"
-                + "相对湿度:" + humidity + "%" + "\n"
-                + "当前小时累计降水量:" + precip + " 毫米" + "\n"
-                + "大气压强:" + pressure + " 百帕" + "\n"
-                + "能见度:" + vis + " 公里" + "\n"
-                + "云量:" + cloud + "%" + "\n"
-                + "露点温度:" + dew + " 度" + "\n"
-                + "数据观测时间:" + DateUtil.format (date, "yyyy-MM-dd HH:mm:ss");
+        return "下面是 " + city.getCityName () + " 实时天气情况\n"
+                + "温度 : " + temp + " 度\n"
+                + "体感温度 : " + feelsLike + " 度\n"
+                + "天气状况 : " + text + "\n"
+                + "风向 : " + windDir + "\n"
+                + "风力等级 : " + windScale + "\n"
+                + "风速 : " + windSpeed + " 公里/小时\n"
+                + "相对湿度 : " + humidity + "%\n"
+                + "当前小时累计降水量 : " + precip + " 毫米\n"
+                + "大气压强 : " + pressure + " 百帕\n"
+                + "能见度 : " + vis + " 公里\n"
+                + "云量 : " + cloud + "%\n"
+                + "露点温度 : " + dew + " 度\n"
+                + "数据观测时间 : " + DateUtil.format (date, "yyyy-MM-dd HH:mm:ss");
     }
 }
