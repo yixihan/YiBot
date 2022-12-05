@@ -9,7 +9,7 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * description
+ * 色图-常量
  *
  * @author yixihan
  * @date 2022/11/24 23:11

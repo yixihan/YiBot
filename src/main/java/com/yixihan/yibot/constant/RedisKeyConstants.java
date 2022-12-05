@@ -1,7 +1,7 @@
 package com.yixihan.yibot.constant;
 
 /**
- * redis Key
+ * redis Key-常量
  *
  * @author yixihan
  * @date 2022/12/4 17:18

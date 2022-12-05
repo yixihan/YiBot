@@ -38,6 +38,7 @@ shiro:
     - com.yixihan.yibot.plugin.AutoApprovalPlugin
     - com.yixihan.yibot.plugin.AutoAddRequestPlugin
     - com.yixihan.yibot.plugin.WithdrawRecordPlugin
+    - com.yixihan.yibot.plugin.WeatherPlugin
 
 management:
   endpoints:
