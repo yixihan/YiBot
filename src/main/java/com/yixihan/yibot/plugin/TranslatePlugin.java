@@ -68,8 +68,8 @@ public class TranslatePlugin extends BotPlugin {
     private String translate(String query) {
         try {
             query = new String (StrUtil.bytes (query, "UTF-8"));
-            boolean isChinese = query.matches ("[\\u4e00-\\u9fa5]+");
-            String from = isChinese ? "zh" : "en";
+            boolean isChinese = query.matches ("^.*[\\u4e00-\\u9fa5]+.*$");
+            String from = "auto";
             String to = isChinese ? "en" : "zh";
             String appid = constants.getAppId ();
             String securityKey = constants.getSign ();
