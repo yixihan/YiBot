@@ -1,6 +1,8 @@
 package com.yixihan.yibot;
 
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.core.util.URLUtil;
+import cn.hutool.http.HttpException;
 import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpResponse;
 import cn.hutool.json.JSONArray;
@@ -10,6 +12,7 @@ import com.yixihan.yibot.constant.PatternConstants;
 import com.yixihan.yibot.pojo.HourlyWeather;
 import com.yixihan.yibot.pojo.NowWeather;
 import com.yixihan.yibot.pojo.WeatherCity;
+import com.yixihan.yibot.utils.MD5Utils;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
@@ -17,7 +20,8 @@ import org.quartz.CronExpression;
 
 import javax.annotation.Nullable;
 
-import static com.yixihan.yibot.constant.NumberConstants.*;
+import static com.yixihan.yibot.constant.NumberConstants.FOUR;
+import static com.yixihan.yibot.constant.NumberConstants.THREE;
 import static com.yixihan.yibot.constant.WeatherConstants.*;
 
 /**
@@ -199,4 +203,47 @@ public class MatcherTest {
         HourlyWeather hourlyWeather = JSONUtil.toBean (json, HourlyWeather.class);
         System.out.println (hourlyWeather.toString ());
     }
+    
+    @Test
+    public void test11 () {
+        String apple = tarnsalte ("apple");
+        System.out.println ("苹果".matches ("[\\u4e00-\\u9fa5]+"));
+    }
+    
+    private String tarnsalte(String query) {
+    
+        try {
+            query = new String (StrUtil.bytes (query, "UTF-8"));
+            boolean isChinese = query.matches ("[\u4E00-\u9FA5|\\！|\\，|\\。|\\（|\\）|\\《|\\》|\\“|\\”|\\？|\\：|\\；|\\【|\\】]");
+            String from = isChinese ? "zh" : "en";
+            String to = isChinese ? "en" : "zh";
+            String appid = "20211110000995432";
+            String securityKey = "T2CHFKUPEUuE9mbE_nL0";
+            String salt = String.valueOf (System.currentTimeMillis ());
+            String sign = MD5Utils.md5 (appid + query + salt + securityKey);
+            log.info ("原文: {}, MD5 : {}", (appid + query + salt + securityKey), sign);
+            query = URLUtil.encode (query);
+            String url = "https://fanyi-api.baidu.com/api/trans/vip/translate"
+                    + "?q=" + query
+                    + "&from=" + from
+                    + "&to=" + to
+                    + "&appid=" + appid
+                    + "&salt=" + salt
+                    + "&sign=" + sign;
+            
+            log.info ("url : {}", url);
+        
+            HttpResponse execute = HttpRequest.get (url).execute ();
+            if (execute.isOk ()) {
+                JSONObject body = JSONUtil.parseObj (execute.body ());
+                log.info ("body : {}", body);
+            }
+        } catch (HttpException e) {
+            log.info ("出现异常");
+        }
+    
+        return null;
+    }
+    
 }
+    

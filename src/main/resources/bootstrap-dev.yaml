@@ -20,3 +20,6 @@ spring:
           - data-id: qqbot-setu-dev.yaml
             group: DEV
             refresh: true
+          - data-id: qqbot-translate-dev.yaml
+            group: DEV
+            refresh: true
