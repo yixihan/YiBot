@@ -45,12 +45,16 @@ public class TranslatePlugin extends BotPlugin {
         if (!eventMessage.startsWith (WORD_ONE)) {
             return super.onGroupMessage (bot, event);
         }
-        if (eventMessage.charAt (TWO) != ' ') {
+        if (eventMessage.length () < THREE || eventMessage.charAt (TWO) != ' ') {
             messageOutput (bot, event, "照着写都写不对?");
             return MESSAGE_IGNORE;
         }
         
         String param = eventMessage.substring (THREE);
+        if (StrUtil.isBlank (param)) {
+            messageOutput (bot, event, "你想我给你翻译虚空?");
+            return MESSAGE_IGNORE;
+        }
         if (param.length () > 2000) {
             messageOutput (bot, event, "你咋不把你那毕业论文拿来让我给你翻译捏?");
             return MESSAGE_IGNORE;
