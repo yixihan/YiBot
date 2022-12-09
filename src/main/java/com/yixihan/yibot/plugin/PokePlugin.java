@@ -1,6 +1,5 @@
 package com.yixihan.yibot.plugin;
 
-import com.mikuac.shiro.bean.MsgChainBean;
 import com.mikuac.shiro.core.Bot;
 import com.mikuac.shiro.core.BotPlugin;
 import com.mikuac.shiro.dto.event.message.GroupMessageEvent;
@@ -68,13 +67,14 @@ public class PokePlugin extends BotPlugin {
     
     @Override
     public int onGroupMessage(@NotNull Bot bot, @NotNull GroupMessageEvent event) {
-        for (MsgChainBean o : event.getArrayMsg ()) {
+        event.getArrayMsg ().forEach ((o) -> {
             if (CQCodeEnums.at.getType ().equals (o.getType ())) {
-                bot.sendGroupMsg (event.getGroupId (), getRandomMessage (CQCodeEnums.at), false);
-                return MESSAGE_IGNORE;
+                if (o.getData ().get ("qq").equals (String.valueOf (bot.getSelfId ()))) {
+                    bot.sendGroupMsg (event.getGroupId (), getRandomMessage (CQCodeEnums.at), false);
+                }
             }
-        }
-    
+        });
+        
         return super.onGroupMessage (bot, event);
     }
     
