@@ -23,3 +23,6 @@ spring:
           - data-id: qqbot-translate-dev.yaml
             group: DEV
             refresh: true
+          - data-id: qqbot-chatGPT-dev.yaml
+            group: DEV
+            refresh: true

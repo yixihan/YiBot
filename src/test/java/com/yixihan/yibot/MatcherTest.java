@@ -9,6 +9,7 @@ import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import com.yixihan.yibot.constant.PatternConstants;
+import com.yixihan.yibot.pojo.ChatGPTBody;
 import com.yixihan.yibot.pojo.HourlyWeather;
 import com.yixihan.yibot.pojo.NowWeather;
 import com.yixihan.yibot.pojo.WeatherCity;
@@ -243,6 +244,35 @@ public class MatcherTest {
         }
     
         return null;
+    }
+    
+    
+    @Test
+    public void test12 () {
+        ChatGPTBody chatGPTBody = new ChatGPTBody ();
+        chatGPTBody.setModel ("text-davinci-003");
+        chatGPTBody.setPrompt ("请证明费马猜想");
+        chatGPTBody.setTemperature (0);
+        chatGPTBody.setMax_tokens (1024);
+        String params = JSONUtil.parse (chatGPTBody).toStringPretty ();
+    
+    
+        try {
+            HttpResponse response = HttpRequest.post ("https://api.openai.com/v1/completions")
+                    .header ("Authorization", "Bearer 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")
+                    .header ("Content-Type", "application/json")
+                    .body (params)
+                    .execute ();
+            
+            if (response.isOk ()) {
+                JSONObject body = JSONUtil.parseObj (response.body ());
+                String text = JSONUtil.parseObj (JSONUtil.parseArray (body.getStr ("choices")).get (0)).getStr ("text");
+                log.info ("text : {}", text);
+            }
+        } catch (HttpException e) {
+            log.info ("出错捏");
+        }
+    
     }
     
 }
