@@ -1,7 +1,6 @@
 package com.yixihan.yibot.plugin;
 
 import cn.hutool.core.util.StrUtil;
-import cn.hutool.http.HttpException;
 import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpResponse;
 import cn.hutool.json.JSONObject;
@@ -20,7 +19,8 @@ import org.springframework.stereotype.Component;
 import javax.annotation.Resource;
 
 import static com.yixihan.yibot.constant.ChatGPTConstants.WORD_ONE;
-import static com.yixihan.yibot.constant.NumberConstants.*;
+import static com.yixihan.yibot.constant.NumberConstants.FIVE;
+import static com.yixihan.yibot.constant.NumberConstants.FOUR;
 
 /**
  * chatGPT 插件
@@ -88,7 +88,7 @@ public class ChatGPTPlugin extends BotPlugin {
                 log.info ("text : {}", text);
                 return text;
             }
-        } catch (HttpException e) {
+        } catch (Exception e) {
             log.info ("出错捏");
             return "出错捏";
         }
