@@ -51,3 +51,11 @@
 - [x] 自动处理加好友请求, 被邀请群事件
 - [x] 消息记录
 
+
+## 部署到docker
+
+```shell
+-v /usr/share/zoneinfo/Asia/Shanghai:/etc/localtime
+
+```
+

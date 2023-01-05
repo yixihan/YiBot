@@ -41,6 +41,7 @@ shiro:
     - com.yixihan.yibot.plugin.WeatherPlugin
     - com.yixihan.yibot.plugin.TranslatePlugin
     - com.yixihan.yibot.plugin.ChatGPTPlugin
+    - com.yixihan.yibot.plugin.DatePlugin
 
 management:
   endpoints:

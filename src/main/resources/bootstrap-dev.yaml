@@ -4,10 +4,10 @@ spring:
       username: yicode
       password: yicode
       discovery:
-        server-addr: 175.24.163.161:3333
+        server-addr: 43.136.182.175:23412
         namespace: qqbot
       config:
-        server-addr: 175.24.163.161:3333
+        server-addr: 43.136.182.175:23412
         namespace: qqbot
         file-extension: yaml
         extension-configs:
