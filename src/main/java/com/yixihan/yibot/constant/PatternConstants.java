@@ -14,6 +14,11 @@ public class PatternConstants {
 
     public static final String GROUP_ID_PATTERN = "\\d{9}";
     
+    
+    public static final String SEND_LIKE_PATTERN = "赞我[-]?[1-9]\\d*次";
+    
+    
+    
     /**
      * 自动提醒 首标题
      */

@@ -42,6 +42,7 @@ shiro:
     - com.yixihan.yibot.plugin.TranslatePlugin
     - com.yixihan.yibot.plugin.ChatGPTPlugin
     - com.yixihan.yibot.plugin.DatePlugin
+    - com.yixihan.yibot.plugin.WordCloudPlugin
 
 management:
   endpoints:

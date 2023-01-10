@@ -28,5 +28,15 @@ public class RedisKeyConstants {
      */
     public static final String PRIVATE_WITHDRAW_RECORD_KEY = "withdraw:private:%s";
     
+    /**
+     * 每日群聊词云
+     */
+    public static final String DAILY_GROUP_WORD_CLOUD = "word_cloud:daily:%s";
+    
+    /**
+     * 每周群聊词云
+     */
+    public static final String WEEK_GROUP_WORD_CLOUD = "word_cloud:week:%s";
+    
     
 }
