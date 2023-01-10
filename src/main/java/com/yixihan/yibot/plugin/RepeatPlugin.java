@@ -2,11 +2,11 @@ package com.yixihan.yibot.plugin;
 
 import cn.hutool.core.util.StrUtil;
 import com.mikuac.shiro.annotation.GroupMessageHandler;
-import com.mikuac.shiro.annotation.Shiro;
+import com.mikuac.shiro.annotation.common.Shiro;
 import com.mikuac.shiro.core.Bot;
 import com.mikuac.shiro.dto.event.message.GroupMessageEvent;
 import com.mikuac.shiro.enums.AtEnum;
-import com.yixihan.yibot.pojo.RepeatNode;
+import com.yixihan.yibot.dto.message.RepeatNode;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;

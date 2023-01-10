@@ -5,7 +5,7 @@ import com.mikuac.shiro.core.Bot;
 import com.mikuac.shiro.core.BotPlugin;
 import com.mikuac.shiro.dto.event.notice.GroupMsgDeleteNoticeEvent;
 import com.mikuac.shiro.dto.event.notice.PrivateMsgDeleteNoticeEvent;
-import com.yixihan.yibot.pojo.MessageNode;
+import com.yixihan.yibot.dto.message.MessageNode;
 import com.yixihan.yibot.utils.CQCodeUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;

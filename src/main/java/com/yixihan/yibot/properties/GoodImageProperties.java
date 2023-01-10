@@ -1,22 +1,18 @@
-package com.yixihan.yibot.constant;
+package com.yixihan.yibot.properties;
 
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 /**
- * 色图-常量
+ * 色图 配置参数
  *
  * @author yixihan
  * @date 2022/11/24 23:11
  */
 @Component
 @Getter
-public class GoodImageConstants {
+public class GoodImageProperties {
 
     @Value("${setu.api}")
     private String url;
@@ -32,11 +28,4 @@ public class GoodImageConstants {
 
     @Value("${setu.setnx-time}")
     private Long setnxTime;
-
-    private final List<String> whiteList = new ArrayList<> ();
-
-    public void initList() {
-        String[] splits = val.split (", ");
-        whiteList.addAll (Arrays.asList (splits));
-    }
 }

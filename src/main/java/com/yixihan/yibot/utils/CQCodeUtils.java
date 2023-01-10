@@ -1,9 +1,9 @@
 package com.yixihan.yibot.utils;
 
-import com.mikuac.shiro.bean.MsgChainBean;
+import com.mikuac.shiro.bo.ArrayMsg;
 import com.mikuac.shiro.common.utils.ShiroUtils;
 import com.yixihan.yibot.enums.CQCodeEnums;
-import com.yixihan.yibot.pojo.MessageNode;
+import com.yixihan.yibot.dto.message.MessageNode;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
@@ -37,7 +37,7 @@ public class CQCodeUtils {
      * @param type CQ code type
      */
     public static String extracted(String val, CQCodeEnums type) {
-        MsgChainBean msb = new MsgChainBean ();
+        ArrayMsg msb = new ArrayMsg ();
         msb.setType (type.getType ());
         HashMap<String, String> map = new HashMap<> ();
         if (CQCodeEnums.image.equals (type) || CQCodeEnums.video.equals (type)) {

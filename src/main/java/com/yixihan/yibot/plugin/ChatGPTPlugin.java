@@ -8,9 +8,10 @@ import cn.hutool.json.JSONUtil;
 import com.mikuac.shiro.core.Bot;
 import com.mikuac.shiro.core.BotPlugin;
 import com.mikuac.shiro.dto.event.message.GroupMessageEvent;
-import com.yixihan.yibot.constant.ChatGPTConstants;
+import com.yixihan.yibot.constant.CommonConstants;
+import com.yixihan.yibot.dto.chat.ChatGPTBody;
 import com.yixihan.yibot.enums.CQCodeEnums;
-import com.yixihan.yibot.pojo.ChatGPTBody;
+import com.yixihan.yibot.properties.ChatGPTProperties;
 import com.yixihan.yibot.utils.CQCodeUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
@@ -18,7 +19,6 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 
-import static com.yixihan.yibot.constant.ChatGPTConstants.WORD_ONE;
 import static com.yixihan.yibot.constant.NumberConstants.FIVE;
 import static com.yixihan.yibot.constant.NumberConstants.FOUR;
 
@@ -33,13 +33,13 @@ import static com.yixihan.yibot.constant.NumberConstants.FOUR;
 public class ChatGPTPlugin extends BotPlugin {
     
     @Resource
-    private ChatGPTConstants constants;
+    private ChatGPTProperties prop;
     
     @Override
     public int onGroupMessage(@NotNull Bot bot, @NotNull GroupMessageEvent event) {
         String eventMessage = event.getMessage ();
         
-        if (!eventMessage.startsWith (WORD_ONE)) {
+        if (!eventMessage.startsWith (CommonConstants.CHAT_WORD_ONE)) {
             return MESSAGE_IGNORE;
         }
     
@@ -76,8 +76,8 @@ public class ChatGPTPlugin extends BotPlugin {
         String params = JSONUtil.parse (chatGPTBody).toStringPretty ();
         
         try {
-            HttpResponse response = HttpRequest.post (constants.getApiUrl ())
-                    .header ("Authorization", "Bearer " + constants.getApiKey ())
+            HttpResponse response = HttpRequest.post (prop.getApiUrl ())
+                    .header ("Authorization", "Bearer " + prop.getApiKey ())
                     .header ("Content-Type", "application/json")
                     .body (params)
                     .execute ();

@@ -1,4 +1,4 @@
-package com.yixihan.yibot.pojo;
+package com.yixihan.yibot.dto.message;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

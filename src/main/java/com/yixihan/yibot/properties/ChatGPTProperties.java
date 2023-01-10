@@ -1,20 +1,18 @@
-package com.yixihan.yibot.constant;
+package com.yixihan.yibot.properties;
 
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 /**
- * chatGPT 常量
+ * chatGPT 配置参数
  *
  * @author yixihan
  * @date 2022/12/10 15:57
  */
 @Getter
 @Component
-public class ChatGPTConstants {
-    
-    public static final String WORD_ONE = "chat";
+public class ChatGPTProperties {
     
     @Value ("${chatGPT.api-url}")
     private String apiUrl;

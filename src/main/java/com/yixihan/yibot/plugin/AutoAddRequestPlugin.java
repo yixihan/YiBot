@@ -18,7 +18,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.yixihan.yibot.constant.CommonConstants.INVITE;
 import static com.yixihan.yibot.constant.CommonConstants.MASTER_ID;
 
 /**
@@ -33,6 +32,8 @@ import static com.yixihan.yibot.constant.CommonConstants.MASTER_ID;
 @Slf4j
 @Component
 public class AutoAddRequestPlugin extends BotPlugin {
+    
+    public static final String INVITE = "invite";
     
     List<Long> groupIdList = new ArrayList<> ();
     

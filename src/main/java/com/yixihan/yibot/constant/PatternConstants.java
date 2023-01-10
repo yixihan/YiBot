@@ -1,7 +1,7 @@
 package com.yixihan.yibot.constant;
 
 /**
- * description
+ * 正则常量
  *
  * @author yixihan
  * @date 2022/11/23 23:45

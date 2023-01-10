@@ -1,4 +1,4 @@
-package com.yixihan.yibot.pojo;
+package com.yixihan.yibot.dto.weather;
 
 import cn.hutool.core.date.DateUtil;
 import com.alibaba.fastjson2.annotation.JSONField;
@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 /**
- * 逐小时天气
+ * 逐小时天气 返回实体类
  *
  * @author yixihan
  * @date 2022/12/5 21:22

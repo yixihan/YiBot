@@ -9,21 +9,27 @@ import cn.hutool.json.JSONUtil;
 import com.mikuac.shiro.core.Bot;
 import com.mikuac.shiro.core.BotPlugin;
 import com.mikuac.shiro.dto.event.message.GroupMessageEvent;
+import com.yixihan.yibot.constant.CommonConstants;
+import com.yixihan.yibot.dto.message.MessageNode;
+import com.yixihan.yibot.dto.weather.FutureWeather;
+import com.yixihan.yibot.dto.weather.HourlyWeather;
+import com.yixihan.yibot.dto.weather.NowWeather;
+import com.yixihan.yibot.dto.weather.WeatherCity;
 import com.yixihan.yibot.enums.CQCodeEnums;
-import com.yixihan.yibot.pojo.*;
+import com.yixihan.yibot.properties.WeatherProperties;
 import com.yixihan.yibot.utils.CQCodeUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
 import static com.yixihan.yibot.constant.NumberConstants.*;
-import static com.yixihan.yibot.constant.WeatherConstants.*;
 
 /**
  * 天气查询插件
@@ -35,29 +41,32 @@ import static com.yixihan.yibot.constant.WeatherConstants.*;
 @Component
 public class WeatherPlugin extends BotPlugin {
     
+    @Resource
+    private WeatherProperties prop;
+    
     
     @Override
     public int onGroupMessage(@NotNull Bot bot, @NotNull GroupMessageEvent event) {
         String[] queryParams = event.getMessage ().split (" ");
     
-        if (!WEATHER_QUERY_FIRST.equals (queryParams[0])) {
+        if (!CommonConstants.WEATHER_QUERY_FIRST.equals (queryParams[0])) {
             return MESSAGE_IGNORE;
         }
-        if (Arrays.stream(WEATHER_QUERY_SECOND).noneMatch ((o) -> o.equals (queryParams[1]))) {
+        if (Arrays.stream(CommonConstants.WEATHER_QUERY_SECOND).noneMatch ((o) -> o.equals (queryParams[1]))) {
             messageOutput (bot, event, "错误指令");
             return MESSAGE_IGNORE;
         }
         
-        if (WEATHER_QUERY_SECOND[0].equals (queryParams[1])) {
+        if (CommonConstants.WEATHER_QUERY_SECOND[0].equals (queryParams[1])) {
             // 实时天气查询
             realTimeWeatherQuery (bot, event, queryParams);
-        } else if (WEATHER_QUERY_SECOND[1].equals (queryParams[1])) {
+        } else if (CommonConstants.WEATHER_QUERY_SECOND[1].equals (queryParams[1])) {
             // 未来天气查询
             futureWeatherQuery (bot, event, queryParams);
-        } else if (WEATHER_QUERY_SECOND[2].equals (queryParams[1])) {
+        } else if (CommonConstants.WEATHER_QUERY_SECOND[2].equals (queryParams[1])) {
             // 逐小时天气查询
             hourlyWeatherQuery (bot, event, queryParams);
-        } else if (WEATHER_QUERY_SECOND[3].equals (queryParams[1])) {
+        } else if (CommonConstants.WEATHER_QUERY_SECOND[3].equals (queryParams[1])) {
             // 帮助菜单
             helperWeather (bot, event);
         } else {
@@ -95,8 +104,8 @@ public class WeatherPlugin extends BotPlugin {
             return;
         }
     
-        String url = REAL_TIME_WEATHER_URL
-                + "?key=" + KEY
+        String url = prop.REAL_TIME_WEATHER_URL
+                + "?key=" + prop.KEY
                 + "&location=" + city.getLocationId ();
     
         HttpResponse execute = HttpRequest.get (url).execute ();
@@ -144,14 +153,14 @@ public class WeatherPlugin extends BotPlugin {
             messageOutput (bot, event, "城市搜索不到");
             return;
         }
-        if (Arrays.stream (FUTURE_WEATHER_PARAMS).noneMatch ((o) -> o.toString ().equals (queryParams[queryParams.length - 1]))) {
+        if (Arrays.stream (CommonConstants.FUTURE_WEATHER_PARAMS).noneMatch ((o) -> o.toString ().equals (queryParams[queryParams.length - 1]))) {
             log.warn ("天气查询-实时天气查询-查询天数错误");
             messageOutput (bot, event, "查询天数错误");
             return;
         }
     
-        String url = String.format (FUTURE_WEATHER_URL, queryParams[queryParams.length - 1])
-                + "?key=" + KEY
+        String url = String.format (prop.FUTURE_WEATHER_URL, queryParams[queryParams.length - 1])
+                + "?key=" + prop.KEY
                 + "&location=" + city.getLocationId ();
     
         HttpResponse execute = HttpRequest.get (url).execute ();
@@ -214,14 +223,14 @@ public class WeatherPlugin extends BotPlugin {
             messageOutput (bot, event, "城市搜索不到");
             return;
         }
-        if (Arrays.stream (HOURLY_WEATHER_PARAMS).noneMatch ((o) -> o.toString ().equals (queryParams[queryParams.length - 1]))) {
+        if (Arrays.stream (CommonConstants.HOURLY_WEATHER_PARAMS).noneMatch ((o) -> o.toString ().equals (queryParams[queryParams.length - 1]))) {
             log.warn ("天气查询-实时天气查询-查询天数错误");
             messageOutput (bot, event, "查询天数错误");
             return;
         }
     
-        String url = String.format (HOURLY_WEATHER_URL, queryParams[queryParams.length - 1])
-                + "?key=" + KEY
+        String url = String.format (prop.HOURLY_WEATHER_URL, queryParams[queryParams.length - 1])
+                + "?key=" + prop.KEY
                 + "&location=" + city.getLocationId ();
     
         HttpResponse execute = HttpRequest.get (url).execute ();
@@ -286,8 +295,8 @@ public class WeatherPlugin extends BotPlugin {
      * @return locationId
      */
     private WeatherCity citySearch (@Nullable String adm, @NotNull String location) {
-        String url = LOCATION_URL
-                + "?key=" + KEY
+        String url = prop.LOCATION_URL
+                + "?key=" + prop.KEY
                 + (StrUtil.isEmpty (adm) ? "" : "&adm=" + adm)
                 + "&location=" + location;
         HttpResponse execute = HttpRequest.get (url).execute ();

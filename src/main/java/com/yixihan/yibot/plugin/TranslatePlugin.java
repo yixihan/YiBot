@@ -10,8 +10,9 @@ import cn.hutool.json.JSONUtil;
 import com.mikuac.shiro.core.Bot;
 import com.mikuac.shiro.core.BotPlugin;
 import com.mikuac.shiro.dto.event.message.GroupMessageEvent;
-import com.yixihan.yibot.constant.TranslateConstants;
+import com.yixihan.yibot.constant.CommonConstants;
 import com.yixihan.yibot.enums.CQCodeEnums;
+import com.yixihan.yibot.properties.TranslateProperties;
 import com.yixihan.yibot.utils.CQCodeUtils;
 import com.yixihan.yibot.utils.MD5Utils;
 import lombok.extern.slf4j.Slf4j;
@@ -22,7 +23,6 @@ import javax.annotation.Resource;
 
 import static com.yixihan.yibot.constant.NumberConstants.THREE;
 import static com.yixihan.yibot.constant.NumberConstants.TWO;
-import static com.yixihan.yibot.constant.TranslateConstants.WORD_ONE;
 
 /**
  * 翻译插件
@@ -35,14 +35,14 @@ import static com.yixihan.yibot.constant.TranslateConstants.WORD_ONE;
 public class TranslatePlugin extends BotPlugin {
     
     @Resource
-    private TranslateConstants constants;
+    private TranslateProperties constants;
     
     
     @Override
     public int onGroupMessage(@NotNull Bot bot, @NotNull GroupMessageEvent event) {
         String eventMessage = event.getMessage ();
         
-        if (!eventMessage.startsWith (WORD_ONE)) {
+        if (!eventMessage.startsWith (CommonConstants.TRANSLATE_WORD_ONE)) {
             return super.onGroupMessage (bot, event);
         }
         if (eventMessage.length () < THREE || eventMessage.charAt (TWO) != ' ') {

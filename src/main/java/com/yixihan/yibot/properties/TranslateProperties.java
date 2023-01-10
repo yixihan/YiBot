@@ -1,20 +1,18 @@
-package com.yixihan.yibot.constant;
+package com.yixihan.yibot.properties;
 
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 /**
- * description
+ * 翻译 配置参数
  *
  * @author yixihan
  * @date 2022/12/8 21:32
  */
 @Component
 @Getter
-public class TranslateConstants {
-    
-    public static final String WORD_ONE = "翻译";
+public class TranslateProperties {
     
     @Value ("${translate.api}")
     private String api;
