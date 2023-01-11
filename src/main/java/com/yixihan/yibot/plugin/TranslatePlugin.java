@@ -21,9 +21,6 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 
-import static com.yixihan.yibot.constant.NumberConstants.THREE;
-import static com.yixihan.yibot.constant.NumberConstants.TWO;
-
 /**
  * 翻译插件
  *
@@ -41,25 +38,24 @@ public class TranslatePlugin extends BotPlugin {
     @Override
     public int onGroupMessage(@NotNull Bot bot, @NotNull GroupMessageEvent event) {
         String eventMessage = event.getMessage ();
-        
-        if (!eventMessage.startsWith (CommonConstants.TRANSLATE_WORD_ONE)) {
+        String param;
+    
+        if (eventMessage.startsWith (CommonConstants.TRANSLATE_WORD_ONE)) {
+            param = eventMessage.substring (CommonConstants.TRANSLATE_WORD_ONE.length () + 1);
+        } else if (eventMessage.startsWith (CommonConstants.TRANSLATE_WORD_ONE_ENG)) {
+            param = eventMessage.substring (CommonConstants.TRANSLATE_WORD_ONE_ENG.length () + 1);
+        } else {
             return super.onGroupMessage (bot, event);
         }
-        if (eventMessage.length () < THREE || eventMessage.charAt (TWO) != ' ') {
-            messageOutput (bot, event, "照着写都写不对?");
-            return MESSAGE_IGNORE;
-        }
         
-        String param = eventMessage.substring (THREE);
         if (StrUtil.isBlank (param)) {
-            messageOutput (bot, event, "你想我给你翻译虚空?");
             return MESSAGE_IGNORE;
         }
         if (param.length () > 2000) {
             messageOutput (bot, event, "你咋不把你那毕业论文拿来让我给你翻译捏?");
             return MESSAGE_IGNORE;
         }
-    
+        
         String translate = translate (param);
         if (StrUtil.isEmpty (translate)) {
             messageOutput (bot, event, "翻译不来捏");
@@ -80,13 +76,7 @@ public class TranslatePlugin extends BotPlugin {
             String salt = String.valueOf (System.currentTimeMillis ());
             String sign = MD5Utils.md5 (appid + query + salt + securityKey);
             query = URLUtil.encode (query);
-            String url = "https://fanyi-api.baidu.com/api/trans/vip/translate"
-                    + "?q=" + query
-                    + "&from=" + from
-                    + "&to=" + to
-                    + "&appid=" + appid
-                    + "&salt=" + salt
-                    + "&sign=" + sign;
+            String url = "https://fanyi-api.baidu.com/api/trans/vip/translate" + "?q=" + query + "&from=" + from + "&to=" + to + "&appid=" + appid + "&salt=" + salt + "&sign=" + sign;
             HttpResponse execute = HttpRequest.get (url).execute ();
             if (execute.isOk ()) {
                 JSONObject body = JSONUtil.parseObj (execute.body ());
@@ -95,7 +85,7 @@ public class TranslatePlugin extends BotPlugin {
         } catch (HttpException e) {
             log.info ("出现异常");
         }
-    
+        
         return null;
     }
     
@@ -107,8 +97,7 @@ public class TranslatePlugin extends BotPlugin {
      */
     private void messageOutput(@NotNull Bot bot, @NotNull GroupMessageEvent event, String info) {
         String message;
-        message = CQCodeUtils.extracted (event.getSender ().getUserId (),
-                CQCodeEnums.at);
+        message = CQCodeUtils.extracted (event.getSender ().getUserId (), CQCodeEnums.at);
         bot.sendGroupMsg (event.getGroupId (), message + info, false);
     }
     

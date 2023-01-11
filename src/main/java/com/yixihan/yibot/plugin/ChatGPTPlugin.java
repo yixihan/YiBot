@@ -5,14 +5,13 @@ import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpResponse;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
+import com.mikuac.shiro.common.utils.MsgUtils;
 import com.mikuac.shiro.core.Bot;
 import com.mikuac.shiro.core.BotPlugin;
 import com.mikuac.shiro.dto.event.message.GroupMessageEvent;
 import com.yixihan.yibot.constant.CommonConstants;
 import com.yixihan.yibot.dto.chat.ChatGPTBody;
-import com.yixihan.yibot.enums.CQCodeEnums;
 import com.yixihan.yibot.properties.ChatGPTProperties;
-import com.yixihan.yibot.utils.CQCodeUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
@@ -38,29 +37,44 @@ public class ChatGPTPlugin extends BotPlugin {
     @Override
     public int onGroupMessage(@NotNull Bot bot, @NotNull GroupMessageEvent event) {
         String eventMessage = event.getMessage ();
-        
+        String sendMessage;
+    
         if (!eventMessage.startsWith (CommonConstants.CHAT_WORD_ONE)) {
             return MESSAGE_IGNORE;
         }
     
         if (eventMessage.length () < FIVE || eventMessage.charAt (FOUR) != ' ') {
-            messageOutput (bot, event, "？");
+            sendMessage = MsgUtils.builder ()
+                    .reply (event.getMessageId ())
+                    .text ("?")
+                    .build ();
+            bot.sendGroupMsg (event.getGroupId (), sendMessage, false);
             return MESSAGE_IGNORE;
         }
     
         String param = eventMessage.substring (FIVE);
         if (StrUtil.isBlank (param)) {
-            messageOutput (bot, event, "？");
+            sendMessage = MsgUtils.builder ()
+                    .reply (event.getMessageId ())
+                    .text ("?")
+                    .build ();
+            bot.sendGroupMsg (event.getGroupId (), sendMessage, false);
             return MESSAGE_IGNORE;
         }
-    
-        messageOutput (bot, event, "正在试图解答ing~");
+        
         String answer = chatGPT (param);
         if (StrUtil.isNotBlank (answer)) {
-            messageOutput (bot, event, "已经找到答案捏~");
-            messageOutput (bot, event, answer);
+            sendMessage = MsgUtils.builder ()
+                    .reply (event.getMessageId ())
+                    .text (answer)
+                    .build ();
+            bot.sendGroupMsg (event.getGroupId (), sendMessage, false);
         } else {
-            messageOutput (bot, event, "我布吉岛捏");
+            sendMessage = MsgUtils.builder ()
+                    .reply (event.getMessageId ())
+                    .text ("我布吉岛捏~")
+                    .build ();
+            bot.sendGroupMsg (event.getGroupId (), sendMessage, false);
         }
         
         return super.onGroupMessage (bot, event);
@@ -93,17 +107,5 @@ public class ChatGPTPlugin extends BotPlugin {
             return "出错捏";
         }
         return null;
-    }
-    
-    /**
-     * 消息输出
-     *
-     * @param info 消息
-     */
-    private void messageOutput(@NotNull Bot bot, @NotNull GroupMessageEvent event, String info) {
-        String message;
-        message = CQCodeUtils.extracted (event.getSender ().getUserId (),
-                CQCodeEnums.at);
-        bot.sendGroupMsg (event.getGroupId (), message + info, false);
     }
 }

@@ -25,6 +25,8 @@ import java.util.concurrent.ConcurrentHashMap;
 @Component
 public class RepeatPlugin {
     private static final int MAX_CNT = 4;
+    
+    private final Object key = new Object();
     private final Map<Long, RepeatNode> repeatNodeMap = new ConcurrentHashMap<> ();
 
     @GroupMessageHandler(at = AtEnum.OFF)
@@ -36,17 +38,18 @@ public class RepeatPlugin {
             node.setFlag (false);
             node.setCnt (1);
         } else {
-            if (node.getLastMessage ().equals (event.getMessage ())) {
-                node.setCnt (node.getCnt () + 1);
-                log.info ("message : {}, cnt : {}", event.getMessage (), node.getCnt ());
-                if (node.getCnt () >= MAX_CNT && !node.isFlag ()) {
-                    bot.sendGroupMsg (event.getGroupId (), event.getMessage (), false);
-                    node.setFlag (true);
+            synchronized (key) {
+                if (node.getLastMessage ().equals (event.getMessage ())) {
+                    node.setCnt (node.getCnt () + 1);
+                    if (node.getCnt () >= MAX_CNT && !node.isFlag ()) {
+                        bot.sendGroupMsg (event.getGroupId (), event.getMessage (), false);
+                        node.setFlag (true);
+                    }
+                } else {
+                    node.setFlag (false);
+                    node.setCnt (0);
+                    node.setLastMessage (event.getMessage ());
                 }
-            } else {
-                node.setFlag (false);
-                node.setCnt (0);
-                node.setLastMessage (event.getMessage ());
             }
         }
         repeatNodeMap.put (event.getGroupId (), node);

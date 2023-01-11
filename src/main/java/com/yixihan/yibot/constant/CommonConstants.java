@@ -57,4 +57,7 @@ public class CommonConstants {
     //==========================================翻译
     
     public static final String TRANSLATE_WORD_ONE = "翻译";
+    
+    
+    public static final String TRANSLATE_WORD_ONE_ENG = "translate";
 }

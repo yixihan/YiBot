@@ -1,6 +1,7 @@
 package com.yixihan.yibot.plugin;
 
 import cn.hutool.core.date.DateUtil;
+import com.mikuac.shiro.common.utils.MsgUtils;
 import com.mikuac.shiro.core.Bot;
 import com.mikuac.shiro.core.BotPlugin;
 import com.mikuac.shiro.dto.event.message.AnyMessageEvent;
@@ -24,7 +25,11 @@ public class DatePlugin extends BotPlugin {
     public int onAnyMessage(@NotNull Bot bot, @NotNull AnyMessageEvent event) {
         if (event.getMessage ().equals ("date")) {
             String now = DateUtil.format (new Date (), "yyyy-MM-dd HH:mm:ss");
-            bot.sendMsg (event, now, true);
+            String sendMessage = MsgUtils.builder ()
+                    .reply (event.getMessageId ())
+                    .text (now)
+                    .build ();
+            bot.sendGroupMsg (event.getGroupId (), sendMessage, false);
         }
         
         return super.onAnyMessage (bot, event);
