@@ -23,6 +23,7 @@ import com.mikuac.shiro.core.BotContainer;
 import com.mikuac.shiro.core.BotPlugin;
 import com.mikuac.shiro.dto.event.message.GroupMessageEvent;
 import com.yixihan.yibot.constant.RedisKeyConstants;
+import com.yixihan.yibot.properties.WordCloudProperties;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -48,13 +49,13 @@ import java.util.stream.Collectors;
 @Component
 public class WordCloudPlugin extends BotPlugin {
     
+    private final Set<Long> groupSet = new HashSet<> ();
     @Resource
     private RedisTemplate<String, Object> redisTemplate;
-    
+    @Resource
+    private WordCloudProperties porp;
     @Resource
     private BotContainer botContainer;
-    
-    private final Set<Long> groupSet = new HashSet<> ();
     
     @Override
     public int onGroupMessage(@NotNull Bot bot, @NotNull GroupMessageEvent event) {
@@ -65,39 +66,32 @@ public class WordCloudPlugin extends BotPlugin {
         String dailyKey = String.format (RedisKeyConstants.DAILY_GROUP_WORD_CLOUD, event.getGroupId ());
         String weekKey = String.format (RedisKeyConstants.WEEK_GROUP_WORD_CLOUD, event.getGroupId ());
         
-        ShiroUtils.stringToMsgChain (event.getMessage ()).stream ()
-                .filter ((o) -> "text".equals (o.getType ()))
-                .forEach ((o) -> {
-                    Result result = engine.parse (o.getData ().get ("text"));
-    
-                    CollUtil.newArrayList ((Iterable<Word>) result).forEach ((item) -> {
-                        String text = item.getText ();
-                        String dailyVal = Optional.ofNullable (redisTemplate.opsForHash ().get (dailyKey, text))
-                                .orElse ("0").toString ();
-                        redisTemplate.opsForHash ().put (dailyKey, text, Integer.parseInt (dailyVal) + 1);
-
-                        
-                        String weekVal = Optional.ofNullable (redisTemplate.opsForHash ().get (weekKey, text))
-                                .orElse ("0").toString ();
-                        redisTemplate.opsForHash ().put (weekKey, text, Integer.parseInt (weekVal) + 1);
-                    });
-    
-                });
+        ShiroUtils.stringToMsgChain (event.getMessage ()).stream ().filter ((o) -> "text".equals (o.getType ())).forEach ((o) -> {
+            Result result = engine.parse (o.getData ().get ("text"));
+            
+            CollUtil.newArrayList ((Iterable<Word>) result).forEach ((item) -> {
+                String text = item.getText ();
+                String dailyVal = Optional.ofNullable (redisTemplate.opsForHash ().get (dailyKey, text)).orElse ("0").toString ();
+                redisTemplate.opsForHash ().put (dailyKey, text, Integer.parseInt (dailyVal) + 1);
+                
+                
+                String weekVal = Optional.ofNullable (redisTemplate.opsForHash ().get (weekKey, text)).orElse ("0").toString ();
+                redisTemplate.opsForHash ().put (weekKey, text, Integer.parseInt (weekVal) + 1);
+            });
+            
+        });
         return super.onGroupMessage (bot, event);
     }
     
-    @Scheduled(cron = "0 58 23 * * ?")
-    private void cleanDailyWord () {
+    @Scheduled(cron = "0 58 23 ? * 2,3,4,5,6,7")
+    private void cleanDailyWord() {
         for (Long group : groupSet) {
             ThreadUtil.execAsync (() -> {
                 String dailyKey = String.format (RedisKeyConstants.DAILY_GROUP_WORD_CLOUD, group);
                 
                 List<WordFrequency> wordFrequencyList = getWordFrequencies (dailyKey);
                 String file = getWordCloud (wordFrequencyList, group);
-                String msg = MsgUtils.builder ()
-                        .text ("摸鱼的一天结束啦, 让我来看看大家今天都讨论了啥吧")
-                        .img (OneBotMedia.builder ().file (file))
-                        .build ();
+                String msg = MsgUtils.builder ().text ("摸鱼的一天结束啦, 让我来看看大家今天都讨论了啥吧").img (OneBotMedia.builder ().file (file)).build ();
                 getBot ().sendGroupMsg (group, msg, false);
                 redisTemplate.delete (dailyKey);
             });
@@ -105,20 +99,19 @@ public class WordCloudPlugin extends BotPlugin {
     }
     
     @Scheduled(cron = "0 58 23 ? * 1")
-    private void cleanWeekWord () {
+    private void cleanWeekWord() {
         for (Long group : groupSet) {
             ThreadUtil.execAsync (() -> {
                 String weekKey = String.format (RedisKeyConstants.WEEK_GROUP_WORD_CLOUD, group);
+                String dailyKey = String.format (RedisKeyConstants.DAILY_GROUP_WORD_CLOUD, group);
                 
                 List<WordFrequency> wordFrequencyList = getWordFrequencies (weekKey);
                 String file = getWordCloud (wordFrequencyList, group);
-                String msg = MsgUtils.builder ()
-                        .text ("摸鱼的一天结束啦, 让我来看看大家今天都讨论了啥吧")
-                        .img (OneBotMedia.builder ().file (file))
-                        .build ();
+                String msg = MsgUtils.builder ().text ("摸鱼的一周结束啦, 让我来看看大家今天都讨论了啥吧").img (OneBotMedia.builder ().file (file)).build ();
                 getBot ().sendGroupMsg (group, msg, false);
-    
+                
                 redisTemplate.delete (weekKey);
+                redisTemplate.delete (dailyKey);
             });
         }
         
@@ -133,44 +126,37 @@ public class WordCloudPlugin extends BotPlugin {
     }
     
     private List<WordFrequency> getWordFrequencies(String key) {
-        return redisTemplate.opsForHash ().entries (key).entrySet ()
-                .stream ().map ((entry) -> {
-                    String word = entry.getKey ().toString ();
-                    int count = Integer.parseInt (entry.getValue ().toString ());
-                    return new WordFrequency (word, count);
-                }).collect (Collectors.toList ());
+        return redisTemplate.opsForHash ().entries (key).entrySet ().stream ().map ((entry) -> {
+            String word = entry.getKey ().toString ();
+            int count = Integer.parseInt (entry.getValue ().toString ());
+            return new WordFrequency (word, count);
+        }).collect (Collectors.toList ());
     }
     
     public String getWordCloud(List<WordFrequency> wordFrequencyList, Long group) {
         //此处不设置会出现中文乱码
-        java.awt.Font font = new java.awt.Font("STSong-Light", Font.ITALIC, 18);
+        java.awt.Font font = new java.awt.Font ("STSong-Light", Font.ITALIC, 18);
         //设置图片分辨率
-        Dimension dimension = new Dimension(500, 500);
+        Dimension dimension = new Dimension (500, 500);
         //此处的设置采用内置常量即可，生成词云对象
-        WordCloud wordCloud = new WordCloud(dimension, CollisionMode.PIXEL_PERFECT);
+        WordCloud wordCloud = new WordCloud (dimension, CollisionMode.PIXEL_PERFECT);
         //设置边界及字体
-        wordCloud.setPadding(2);
+        wordCloud.setPadding (2);
         //因为我这边是生成一个圆形,这边设置圆的半径
-        wordCloud.setBackground(new CircleBackground(255));
-        wordCloud.setFontScalar(new SqrtFontScalar(12, 42));
+        wordCloud.setBackground (new CircleBackground (255));
+        wordCloud.setFontScalar (new SqrtFontScalar (12, 42));
         //设置词云显示的三种颜色，越靠前设置表示词频越高的词语的颜色
-        wordCloud.setColorPalette(new LinearGradientColorPalette (
-                Color.RED,
-                Color.BLUE,
-                Color.GREEN,
-                30,
-                30)
-        );
-        wordCloud.setKumoFont(new KumoFont(font));
-        wordCloud.setBackgroundColor(new Color(255, 255, 255));
+        wordCloud.setColorPalette (new LinearGradientColorPalette (Color.RED, Color.BLUE, Color.GREEN, 30, 30));
+        wordCloud.setKumoFont (new KumoFont (font));
+        wordCloud.setBackgroundColor (new Color (255, 255, 255));
         //因为我这边是生成一个圆形,这边设置圆的半径
-        wordCloud.setBackground(new CircleBackground(255));
-        wordCloud.build(wordFrequencyList);
+        wordCloud.setBackground (new CircleBackground (255));
+        wordCloud.build (wordFrequencyList);
         //生成词云图路径
-        String path = "D:\\qqbot\\go-cqhttp\\data\\images";
+        String path = FileUtil.isWindows () ? porp.getWinPath () : porp.getLinuxPath ();
         File filePath = FileUtil.mkdir (new File (FileUtil.getAbsolutePath (path)));
-        String outFileName =group + UUID.fastUUID ().toString () + ".png";
-        wordCloud.writeToFile(filePath + "\\" + outFileName);
+        String outFileName = group + UUID.fastUUID ().toString () + ".png";
+        wordCloud.writeToFile (filePath + "\\" + outFileName);
         return outFileName;
     }
     

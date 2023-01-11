@@ -5,7 +5,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 /**
- * 天气查询-常量
+ * 天气查询 配置参数
  *
  * @author yixihan
  * @date 2022/12/5 15:30
