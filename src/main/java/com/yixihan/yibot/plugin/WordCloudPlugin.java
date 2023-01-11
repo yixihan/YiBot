@@ -139,7 +139,7 @@ public class WordCloudPlugin extends BotPlugin {
     
     public String getWordCloud(List<WordFrequency> wordFrequencyList, Long group) {
         //此处不设置会出现中文乱码
-        java.awt.Font font = new java.awt.Font ("STSong-Light", Font.ITALIC, 18);
+        java.awt.Font font = new java.awt.Font ("STSong-Light", 2, 18);
         //设置图片分辨率
         Dimension dimension = new Dimension (500, 500);
         //此处的设置采用内置常量即可，生成词云对象
