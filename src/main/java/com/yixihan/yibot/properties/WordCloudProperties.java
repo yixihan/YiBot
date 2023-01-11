@@ -19,4 +19,10 @@ public class WordCloudProperties {
     
     @Value ("${word-cloud.linux-path}")
     private String linuxPath;
+    
+    @Value ("${word-cloud.day-filter}")
+    private Integer dayFilter;
+    
+    @Value ("${word-cloud.week-filter}")
+    private Integer weekFilter;
 }

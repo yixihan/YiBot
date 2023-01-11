@@ -78,7 +78,7 @@ public class WordCloudPlugin extends BotPlugin {
                 redisTemplate.opsForHash ().put (weekKey, text, Integer.parseInt (weekVal) + 1);
             });
     
-            List<WordFrequency> wordFrequencyList = getWordFrequencies (dailyKey);
+            List<WordFrequency> wordFrequencyList = getWordFrequencies (dailyKey, true);
             String file = getWordCloud (wordFrequencyList, event.getGroupId ());
             String msg = MsgUtils.builder ().text ("摸鱼的一天结束啦, 让我来看看大家今天都讨论了啥吧").img (OneBotMedia.builder ().file (file)).build ();
             getBot ().sendGroupMsg (event.getGroupId (), msg, false);
@@ -93,7 +93,7 @@ public class WordCloudPlugin extends BotPlugin {
             ThreadUtil.execAsync (() -> {
                 String dailyKey = String.format (RedisKeyConstants.DAILY_GROUP_WORD_CLOUD, group);
                 
-                List<WordFrequency> wordFrequencyList = getWordFrequencies (dailyKey);
+                List<WordFrequency> wordFrequencyList = getWordFrequencies (dailyKey, true);
                 String file = getWordCloud (wordFrequencyList, group);
                 String msg = MsgUtils.builder ().text ("摸鱼的一天结束啦, 让我来看看大家今天都讨论了啥吧").img (OneBotMedia.builder ().file (file)).build ();
                 getBot ().sendGroupMsg (group, msg, false);
@@ -109,7 +109,7 @@ public class WordCloudPlugin extends BotPlugin {
                 String weekKey = String.format (RedisKeyConstants.WEEK_GROUP_WORD_CLOUD, group);
                 String dailyKey = String.format (RedisKeyConstants.DAILY_GROUP_WORD_CLOUD, group);
                 
-                List<WordFrequency> wordFrequencyList = getWordFrequencies (weekKey);
+                List<WordFrequency> wordFrequencyList = getWordFrequencies (weekKey, false);
                 String file = getWordCloud (wordFrequencyList, group);
                 String msg = MsgUtils.builder ().text ("摸鱼的一周结束啦, 让我来看看大家今天都讨论了啥吧").img (OneBotMedia.builder ().file (file)).build ();
                 getBot ().sendGroupMsg (group, msg, false);
@@ -129,11 +129,14 @@ public class WordCloudPlugin extends BotPlugin {
         return botContainer.robots.get (botId);
     }
     
-    private List<WordFrequency> getWordFrequencies(String key) {
+    private List<WordFrequency> getWordFrequencies(String key, Boolean flag) {
         return redisTemplate.opsForHash ().entries (key).entrySet ().stream ().map ((entry) -> {
             String word = entry.getKey ().toString ();
             int count = Integer.parseInt (entry.getValue ().toString ());
             return new WordFrequency (word, count);
+        }).filter ((o) ->  {
+            int min = flag ? porp.getDayFilter () : porp.getWeekFilter ();
+            return o.getFrequency () >= min;
         }).collect (Collectors.toList ());
     }
     
@@ -151,9 +154,9 @@ public class WordCloudPlugin extends BotPlugin {
         wordCloud.setFontScalar (new SqrtFontScalar (12, 42));
         //设置词云显示的三种颜色，越靠前设置表示词频越高的词语的颜色
         wordCloud.setColorPalette (new LinearGradientColorPalette (
-                Color.RED,
-                Color.BLUE,
-                Color.GREEN,
+                Color.getHSBColor (249, 253, 241),
+                Color.getHSBColor (184, 227, 234),
+                Color.getHSBColor (176, 236, 254),
                 30,
                 30)
         );
