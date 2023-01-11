@@ -28,9 +28,7 @@ public class SendLikePlugin extends BotPlugin {
         if (message.matches (PatternConstants.SEND_LIKE_PATTERN)) {
             int num;
             try {
-                message = message.replaceAll ("[^-|0-9]", "");
-                log.info ("message : {}", message);
-                num = Integer.parseInt (message);
+                num = Integer.parseInt (message.replaceAll ("[^-|0-9]", ""));
        
                 if (num <= 0) {
                     sendMessage = MsgUtils.builder ()
