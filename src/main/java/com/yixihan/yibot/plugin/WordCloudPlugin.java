@@ -32,7 +32,6 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.awt.*;
-import java.io.File;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -79,9 +78,9 @@ public class WordCloudPlugin extends BotPlugin {
                 redisTemplate.opsForHash ().put (weekKey, text, Integer.parseInt (weekVal) + 1);
             });
     
-            List<WordFrequency> wordFrequencyList = getWordFrequencies (weekKey);
+            List<WordFrequency> wordFrequencyList = getWordFrequencies (dailyKey);
             String file = getWordCloud (wordFrequencyList, event.getGroupId ());
-            String msg = MsgUtils.builder ().text ("摸鱼的一周结束啦, 让我来看看大家今天都讨论了啥吧").img (OneBotMedia.builder ().file (file)).build ();
+            String msg = MsgUtils.builder ().text ("摸鱼的一天结束啦, 让我来看看大家今天都讨论了啥吧").img (OneBotMedia.builder ().file (file)).build ();
             getBot ().sendGroupMsg (event.getGroupId (), msg, false);
             
         });
@@ -159,9 +158,8 @@ public class WordCloudPlugin extends BotPlugin {
         wordCloud.build (wordFrequencyList);
         //生成词云图路径
         String path = FileUtil.isWindows () ? porp.getWinPath () : porp.getLinuxPath ();
-        File filePath = FileUtil.mkdir (new File (FileUtil.getAbsolutePath (path)));
         String outFileName = group + "-" + UUID.fastUUID () + ".png";
-        wordCloud.writeToFile (filePath + "\\" + outFileName);
+        wordCloud.writeToFile (path + "/" + outFileName);
         return outFileName;
     }
     
