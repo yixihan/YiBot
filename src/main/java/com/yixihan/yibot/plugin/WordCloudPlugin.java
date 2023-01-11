@@ -78,6 +78,11 @@ public class WordCloudPlugin extends BotPlugin {
                 String weekVal = Optional.ofNullable (redisTemplate.opsForHash ().get (weekKey, text)).orElse ("0").toString ();
                 redisTemplate.opsForHash ().put (weekKey, text, Integer.parseInt (weekVal) + 1);
             });
+    
+            List<WordFrequency> wordFrequencyList = getWordFrequencies (weekKey);
+            String file = getWordCloud (wordFrequencyList, event.getGroupId ());
+            String msg = MsgUtils.builder ().text ("摸鱼的一周结束啦, 让我来看看大家今天都讨论了啥吧").img (OneBotMedia.builder ().file (file)).build ();
+            getBot ().sendGroupMsg (event.getGroupId (), msg, false);
             
         });
         return super.onGroupMessage (bot, event);
@@ -155,7 +160,7 @@ public class WordCloudPlugin extends BotPlugin {
         //生成词云图路径
         String path = FileUtil.isWindows () ? porp.getWinPath () : porp.getLinuxPath ();
         File filePath = FileUtil.mkdir (new File (FileUtil.getAbsolutePath (path)));
-        String outFileName = group + UUID.fastUUID ().toString () + ".png";
+        String outFileName = group + "-" + UUID.fastUUID () + ".png";
         wordCloud.writeToFile (filePath + "\\" + outFileName);
         return outFileName;
     }
