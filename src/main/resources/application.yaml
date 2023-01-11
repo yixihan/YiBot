@@ -43,6 +43,7 @@ shiro:
     - com.yixihan.yibot.plugin.ChatGPTPlugin
     - com.yixihan.yibot.plugin.DatePlugin
     - com.yixihan.yibot.plugin.WordCloudPlugin
+    - com.yixihan.yibot.plugin.SendLikePlugin
 
 management:
   endpoints:

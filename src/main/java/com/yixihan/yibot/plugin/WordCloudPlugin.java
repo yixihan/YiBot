@@ -77,12 +77,6 @@ public class WordCloudPlugin extends BotPlugin {
                 String weekVal = Optional.ofNullable (redisTemplate.opsForHash ().get (weekKey, text)).orElse ("0").toString ();
                 redisTemplate.opsForHash ().put (weekKey, text, Integer.parseInt (weekVal) + 1);
             });
-    
-            List<WordFrequency> wordFrequencyList = getWordFrequencies (dailyKey, true);
-            String file = getWordCloud (wordFrequencyList, event.getGroupId ());
-            String msg = MsgUtils.builder ().text ("摸鱼的一天结束啦, 让我来看看大家今天都讨论了啥吧").img (OneBotMedia.builder ().file (file)).build ();
-            getBot ().sendGroupMsg (event.getGroupId (), msg, false);
-            
         });
         return super.onGroupMessage (bot, event);
     }
@@ -154,11 +148,10 @@ public class WordCloudPlugin extends BotPlugin {
         wordCloud.setFontScalar (new SqrtFontScalar (12, 42));
         //设置词云显示的三种颜色，越靠前设置表示词频越高的词语的颜色
         wordCloud.setColorPalette (new LinearGradientColorPalette (
-                Color.getHSBColor (249, 253, 241),
-                Color.getHSBColor (184, 227, 234),
-                Color.getHSBColor (176, 236, 254),
-                30,
-                30)
+                Color.getHSBColor (69, 168, 234),
+                Color.getHSBColor (60, 212, 244),
+                Color.getHSBColor (84, 215, 240),
+                30, 30)
         );
         wordCloud.setKumoFont (new KumoFont (font));
         wordCloud.setBackgroundColor (new Color (255, 255, 255));
