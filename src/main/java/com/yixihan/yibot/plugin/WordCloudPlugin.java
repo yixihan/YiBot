@@ -139,7 +139,7 @@ public class WordCloudPlugin extends BotPlugin {
     
     public String getWordCloud(List<WordFrequency> wordFrequencyList, Long group) {
         //此处不设置会出现中文乱码
-        java.awt.Font font = new java.awt.Font ("STSong-Light", 2, 18);
+        java.awt.Font font = new java.awt.Font ("STSong-Light", Font.ITALIC, 18);
         //设置图片分辨率
         Dimension dimension = new Dimension (500, 500);
         //此处的设置采用内置常量即可，生成词云对象
@@ -150,7 +150,13 @@ public class WordCloudPlugin extends BotPlugin {
         wordCloud.setBackground (new CircleBackground (255));
         wordCloud.setFontScalar (new SqrtFontScalar (12, 42));
         //设置词云显示的三种颜色，越靠前设置表示词频越高的词语的颜色
-        wordCloud.setColorPalette (new LinearGradientColorPalette (Color.RED, Color.BLUE, Color.GREEN, 30, 30));
+        wordCloud.setColorPalette (new LinearGradientColorPalette (
+                Color.RED,
+                Color.BLUE,
+                Color.GREEN,
+                30,
+                30)
+        );
         wordCloud.setKumoFont (new KumoFont (font));
         wordCloud.setBackgroundColor (new Color (255, 255, 255));
         //因为我这边是生成一个圆形,这边设置圆的半径
