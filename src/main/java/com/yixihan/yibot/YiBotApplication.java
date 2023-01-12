@@ -31,7 +31,6 @@ public class YiBotApplication {
         Environment env = springApplication.run(args).getEnvironment();
         log.info("yibot server has started : {}, CPU core : {}",
                 Arrays.toString(env.getActiveProfiles()), Runtime.getRuntime().availableProcessors());
-    
         CronUtil.start ();
     }
 
