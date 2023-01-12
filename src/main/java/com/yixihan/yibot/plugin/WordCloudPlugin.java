@@ -22,6 +22,7 @@ import com.mikuac.shiro.core.Bot;
 import com.mikuac.shiro.core.BotContainer;
 import com.mikuac.shiro.core.BotPlugin;
 import com.mikuac.shiro.dto.event.message.GroupMessageEvent;
+import com.yixihan.yibot.config.GroupConfig;
 import com.yixihan.yibot.constant.RedisKeyConstants;
 import com.yixihan.yibot.properties.WordCloudProperties;
 import lombok.extern.slf4j.Slf4j;
@@ -32,10 +33,8 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.awt.*;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -48,7 +47,10 @@ import java.util.stream.Collectors;
 @Component
 public class WordCloudPlugin extends BotPlugin {
     
-    private final Set<Long> groupSet = new HashSet<> ();
+    
+    @Resource
+    private GroupConfig config;
+    
     @Resource
     private RedisTemplate<String, Object> redisTemplate;
     @Resource
@@ -60,7 +62,9 @@ public class WordCloudPlugin extends BotPlugin {
     public int onGroupMessage(@NotNull Bot bot, @NotNull GroupMessageEvent event) {
         //自动根据用户引入的分词库的jar来自动选择使用的引擎
         TokenizerEngine engine = new MmsegEngine ();
-        groupSet.add (event.getGroupId ());
+        if (!config.getWordCloudList ().contains (event.getGroupId ())) {
+            return super.onGroupMessage (bot, event);
+        }
         
         String dailyKey = String.format (RedisKeyConstants.DAILY_GROUP_WORD_CLOUD, event.getGroupId ());
         String weekKey = String.format (RedisKeyConstants.WEEK_GROUP_WORD_CLOUD, event.getGroupId ());
@@ -83,7 +87,7 @@ public class WordCloudPlugin extends BotPlugin {
     
     @Scheduled(cron = "0 58 23 ? * 2,3,4,5,6,7")
     private void cleanDailyWord() {
-        for (Long group : groupSet) {
+        for (Long group : config.getWordCloudList ()) {
             ThreadUtil.execAsync (() -> {
                 String dailyKey = String.format (RedisKeyConstants.DAILY_GROUP_WORD_CLOUD, group);
                 
@@ -98,7 +102,7 @@ public class WordCloudPlugin extends BotPlugin {
     
     @Scheduled(cron = "0 58 23 ? * 1")
     private void cleanWeekWord() {
-        for (Long group : groupSet) {
+        for (Long group : config.getWordCloudList ()) {
             ThreadUtil.execAsync (() -> {
                 String weekKey = String.format (RedisKeyConstants.WEEK_GROUP_WORD_CLOUD, group);
                 String dailyKey = String.format (RedisKeyConstants.DAILY_GROUP_WORD_CLOUD, group);
@@ -112,8 +116,6 @@ public class WordCloudPlugin extends BotPlugin {
                 redisTemplate.delete (dailyKey);
             });
         }
-        
-        groupSet.clear ();
     }
     
     private Bot getBot() {
