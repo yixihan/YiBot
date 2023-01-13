@@ -19,14 +19,22 @@ import java.util.List;
 public class GroupConfig {
     
     /**
-     * group.commonList
-     * 这里list名需要和application.properties中的参数一致
+     * 通用插件权限
      */
     private List<Long> commonList = new ArrayList<> ();
     
-    
+    /**
+     * 瑟图权限
+     */
     private List<Long> setuList = new ArrayList<> ();
     
-    
+    /**
+     * 词云权限
+     */
     private List<Long> wordCloudList = new ArrayList<> ();
+    
+    /**
+     * 自动签到权限
+     */
+    private List<Long> autoCheckList = new ArrayList<> ();
 }

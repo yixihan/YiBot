@@ -58,6 +58,9 @@ public class CommonConstants {
     
     public static final String TRANSLATE_WORD_ONE = "翻译";
     
-    
     public static final String TRANSLATE_WORD_ONE_ENG = "translate";
+    
+    //==========================================cordCloud 自动签到
+    
+    public static final String CORD_CLOUD_WORD_ONE = "cordCloud";
 }

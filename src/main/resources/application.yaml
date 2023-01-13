@@ -44,6 +44,7 @@ shiro:
     - com.yixihan.yibot.plugin.DatePlugin
     - com.yixihan.yibot.plugin.WordCloudPlugin
     - com.yixihan.yibot.plugin.SendLikePlugin
+    - com.yixihan.yibot.plugin.check.CordCloudPlugin
   interceptor: com.yixihan.yibot.interceptor.GroupInterceptor
 
 management:
