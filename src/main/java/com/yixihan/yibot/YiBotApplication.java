@@ -27,11 +27,11 @@ import java.util.Arrays;
 public class YiBotApplication {
     
     public static void main(String[] args) {
+        System.setProperty("https.protocols", "TLSv1.2,TLSv1.1,SSLv3");
         SpringApplication springApplication = new SpringApplication(YiBotApplication.class);
         Environment env = springApplication.run(args).getEnvironment();
         log.info("yibot server has started : {}, CPU core : {}",
                 Arrays.toString(env.getActiveProfiles()), Runtime.getRuntime().availableProcessors());
         CronUtil.start ();
     }
-
 }
