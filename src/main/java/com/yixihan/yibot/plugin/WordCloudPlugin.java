@@ -1,6 +1,7 @@
 package com.yixihan.yibot.plugin;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.lang.UUID;
 import cn.hutool.core.thread.ThreadUtil;
@@ -90,11 +91,12 @@ public class WordCloudPlugin extends BotPlugin {
         for (Long group : config.getWordCloudList ()) {
             ThreadUtil.execAsync (() -> {
                 String dailyKey = String.format (RedisKeyConstants.DAILY_GROUP_WORD_CLOUD, group);
-                
                 List<WordFrequency> wordFrequencyList = getWordFrequencies (dailyKey, true);
-                String file = getWordCloud (wordFrequencyList, group);
-                String msg = MsgUtils.builder ().text ("摸鱼的一天结束啦, 让我来看看大家今天都讨论了啥吧").img (OneBotMedia.builder ().file (file)).build ();
-                getBot ().sendGroupMsg (group, msg, false);
+                if (CollectionUtil.isNotEmpty (wordFrequencyList)) {
+                    String file = getWordCloud (wordFrequencyList, group);
+                    String msg = MsgUtils.builder ().text ("摸鱼的一天结束啦, 让我来看看大家今天都讨论了啥吧").img (OneBotMedia.builder ().file (file)).build ();
+                    getBot ().sendGroupMsg (group, msg, false);
+                }
                 redisTemplate.delete (dailyKey);
             });
         }
@@ -108,9 +110,11 @@ public class WordCloudPlugin extends BotPlugin {
                 String dailyKey = String.format (RedisKeyConstants.DAILY_GROUP_WORD_CLOUD, group);
                 
                 List<WordFrequency> wordFrequencyList = getWordFrequencies (weekKey, false);
-                String file = getWordCloud (wordFrequencyList, group);
-                String msg = MsgUtils.builder ().text ("摸鱼的一周结束啦, 让我来看看大家今天都讨论了啥吧").img (OneBotMedia.builder ().file (file)).build ();
-                getBot ().sendGroupMsg (group, msg, false);
+                if (CollectionUtil.isNotEmpty (wordFrequencyList)) {
+                    String file = getWordCloud (wordFrequencyList, group);
+                    String msg = MsgUtils.builder ().text ("摸鱼的一周结束啦, 让我来看看大家今天都讨论了啥吧").img (OneBotMedia.builder ().file (file)).build ();
+                    getBot ().sendGroupMsg (group, msg, false);
+                }
                 
                 redisTemplate.delete (weekKey);
                 redisTemplate.delete (dailyKey);
