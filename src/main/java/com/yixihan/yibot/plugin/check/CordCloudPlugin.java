@@ -402,11 +402,11 @@ public class CordCloudPlugin extends BotPlugin {
                 
             }
             log.info ("message : {}", message);
-            if (cordCloud.getIsSendEmail ()) {
+            if (cordCloud.getIsSendEmail () != null && cordCloud.getIsSendEmail ()) {
                 mailSendService.sendMail (message, cordCloud.getSendEmail ());
                 log.info ("邮件发送成功");
             }
-            if (cordCloud.getIsSendQQMsg ()) {
+            if (cordCloud.getIsSendQQMsg () != null && cordCloud.getIsSendQQMsg ()) {
                 bot.sendPrivateMsg (cordCloud.getSendQQ (), message, false);
                 log.info ("QQ消息发送成功");
             }
