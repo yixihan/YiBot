@@ -57,3 +57,7 @@ management:
     health:
       enabled: true
       show-details: always # 永远展示完整信息
+
+logging:
+  level:
+    com.chenlb.mmseg4j: ERROR
