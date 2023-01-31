@@ -41,9 +41,11 @@ public class MessageRecordPlugin {
     @GroupMessageHandler
     public void groupMessageRecord(@NotNull Bot bot, @NotNull GroupMessageEvent event) {
         String message = event.getMessage ();
-        log.info ("消息来源 : 群消息, 群号 : {}, 发送者QQ : {}, 消息 : {}", event.getGroupId (), event.getSender ().getUserId (), message);
         String key = String.format (GROUP_MESSAGE_RECORD_KEY, event.getGroupId ());
-        MessageNode node = new MessageNode (event.getUserId (), event.getSender ().getNickname (), (long) event.getMessageId (), message);
+        MessageNode node = new MessageNode (event.getUserId (),
+                event.getSender ().getNickname (),
+                (long) event.getMessageId (),
+                message);
         redisKeySet.add (key);
         redisTemplate.opsForList ().rightPush (key, JSONUtil.toJsonStr (node));
     }
@@ -51,9 +53,11 @@ public class MessageRecordPlugin {
     @PrivateMessageHandler
     public void privateMessageRecord(@NotNull Bot bot, @NotNull PrivateMessageEvent event) {
         String message = event.getMessage ();
-        log.info ("消息来源 : 私聊消息, 发送者QQ : {}, 消息 : {}", event.getUserId (), event.getMessage ());
         String key = String.format (PRIVATE_MESSAGE_RECORD_KEY, event.getUserId ());
-        MessageNode node = new MessageNode (event.getUserId (), event.getPrivateSender ().getNickname (), (long) event.getMessageId (), message);
+        MessageNode node = new MessageNode (event.getUserId (),
+                event.getPrivateSender ().getNickname (),
+                (long) event.getMessageId (),
+                message);
         redisKeySet.add (key);
         redisTemplate.opsForList ().rightPush (key, JSONUtil.toJsonStr (node));
     }

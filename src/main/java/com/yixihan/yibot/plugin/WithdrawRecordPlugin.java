@@ -14,10 +14,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.yixihan.yibot.constant.CommonConstants.MASTER_ID;
@@ -36,6 +33,8 @@ public class WithdrawRecordPlugin extends BotPlugin {
     @Resource
     private RedisTemplate<String, Object> redisTemplate;
     
+    private static final Set<String> redisKeySet = new HashSet<> ();
+    
     /**
      * 群消息撤回记录
      */
@@ -44,12 +43,16 @@ public class WithdrawRecordPlugin extends BotPlugin {
         MessageNode node = saveMessageNode (event.getMsgId (), event.getGroupId (), true);
         
         // 发给易老师
-        List<MessageNode> list = new ArrayList<> ();
-        list.add (new MessageNode (MASTER_ID, "易老师", null, "消息类型 : 群消息"));
-        list.add (new MessageNode (MASTER_ID, "易老师", null, "消息来源 : " + event.getGroupId ()));
-        list.add (node);
-        List<Map<String, Object>> forwardMsg = CQCodeUtils.generateForwardMsg (list);
-        bot.sendPrivateForwardMsg (MASTER_ID, forwardMsg);
+        if (node.getMessage ().contains ("CQ:forward,id=")) {
+            bot.sendPrivateMsg (MASTER_ID, node.getMessage (), false);
+        } else {
+            List<MessageNode> list = new ArrayList<> ();
+            list.add (new MessageNode (MASTER_ID, "易老师", null, "消息类型 : 群消息"));
+            list.add (new MessageNode (MASTER_ID, "易老师", null, "消息来源 : " + event.getGroupId ()));
+            list.add (node);
+            List<Map<String, Object>> forwardMsg = CQCodeUtils.generateForwardMsg (list);
+            bot.sendPrivateForwardMsg (MASTER_ID, forwardMsg);
+        }
         return super.onGroupMsgDeleteNotice (bot, event);
     }
     
@@ -61,12 +64,16 @@ public class WithdrawRecordPlugin extends BotPlugin {
         MessageNode node = saveMessageNode (event.getMsgId (), event.getUserId (), false);
         
         // 发给易老师
-        List<MessageNode> list = new ArrayList<> ();
-        list.add (new MessageNode (MASTER_ID, "易老师", null, "消息类型 : 私聊消息"));
-        list.add (new MessageNode (MASTER_ID, "易老师", null, "消息来源 : " + event.getUserId ()));
-        list.add (node);
-        List<Map<String, Object>> forwardMsg = CQCodeUtils.generateForwardMsg (list);
-        bot.sendPrivateForwardMsg (MASTER_ID, forwardMsg);
+        if (node.getMessage ().contains ("CQ:forward,id=")) {
+            bot.sendPrivateMsg (MASTER_ID, node.getMessage (), false);
+        } else {
+            List<MessageNode> list = new ArrayList<> ();
+            list.add (new MessageNode (MASTER_ID, "易老师", null, "消息类型 : 私聊消息"));
+            list.add (new MessageNode (MASTER_ID, "易老师", null, "消息来源 : " + event.getUserId ()));
+            list.add (node);
+            List<Map<String, Object>> forwardMsg = CQCodeUtils.generateForwardMsg (list);
+            bot.sendPrivateForwardMsg (MASTER_ID, forwardMsg);
+        }
         return super.onPrivateMsgDeleteNotice (bot, event);
     }
     
@@ -96,12 +103,13 @@ public class WithdrawRecordPlugin extends BotPlugin {
         
         // 存储进 redis
         key = String.format (flag ? GROUP_WITHDRAW_RECORD_KEY : PRIVATE_WITHDRAW_RECORD_KEY, id);
+        redisKeySet.add (key);
         redisTemplate.opsForList ().rightPush (key, JSONUtil.toJsonStr (node));
         return node;
     }
     
-    @Scheduled(cron = "0 0 0 * * ?")
-    public void clearWithdrawMessage() {
-    
+    @Scheduled(cron = "0 0 0 ? * 7")
+    public void clearMessageRecord () {
+        redisKeySet.forEach ((key) -> redisTemplate.delete (key));
     }
 }
