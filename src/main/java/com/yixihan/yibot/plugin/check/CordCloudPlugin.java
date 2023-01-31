@@ -384,10 +384,10 @@ public class CordCloudPlugin extends BotPlugin {
                 }
                 String cordCloudAvgCnt = StrUtil.toStringOrNull (redisTemplate.opsForValue ()
                         .get (prop.getCordCloudAvgCntName ()));
-                double cnt = cordCloudAvgCnt == null ? 0 : Double.parseDouble (cordCloudAvgCnt);
+                double cnt = cordCloudAvgCnt == null ? 1 : Double.parseDouble (cordCloudAvgCnt);
                 String cordCloudAvgSum = StrUtil.toStringOrNull (redisTemplate.opsForValue ()
                         .get (prop.getCordCloudAvgSumName ()));
-                double sum = cordCloudAvgSum == null ? 0 : Double.parseDouble (cordCloudAvgSum);
+                double sum = cordCloudAvgSum == null ? 1 : Double.parseDouble (cordCloudAvgSum);
                 double avg = NumberUtil.div (sum, cnt);
                 double thisSum = Integer.parseInt (sb.toString ());
                 cnt++;
