@@ -110,7 +110,7 @@ public class CordCloudPlugin extends BotPlugin {
                     .build ();
             bot.sendGroupMsg (event.getGroupId (), sendMessage, false);
         } else if (message.startsWith (CORD_CLOUD_WORD_ONE + " check")) {
-            String result = checkNow (message.split (" "), bot);
+            String result = checkNow (message.split (" "));
             sendMessage = MsgUtils
                     .builder ()
                     .reply (event.getMessageId ())
@@ -290,17 +290,11 @@ public class CordCloudPlugin extends BotPlugin {
      * 立即签到
      *
      * @param params 参数
-     * @param bot qq bot
      * @return 返回消息
      */
-    private String checkNow(@NotNull String[] params, @NotNull Bot bot) {
-        if (params.length == 3) {
-            Object obj = redisTemplate.opsForHash ().get (prop.getCordCloudName (), params[2]);
-            if (ObjectUtil.isNull (obj)) {
-                return "没有该用户";
-            }
-            CordCloud cordCloud = BeanUtil.toBean (obj, CordCloud.class);
-            checkInCordCloud (cordCloud, bot);
+    private String checkNow(@NotNull String[] params) {
+        if (params.length == 2) {
+            autoCheckInCordCloud ();
             return "操作成功";
         } else {
             return "传的什么玩意儿? 看看帮助";
@@ -338,8 +332,8 @@ public class CordCloudPlugin extends BotPlugin {
         Map<Object, Object> map = redisTemplate.opsForHash ().entries (prop.getCordCloudName ());
         Bot bot = getBot ();
         for (Map.Entry<Object, Object> entry : map.entrySet ()) {
-            ThreadUtil.execAsync (() -> {
-                CordCloud cordCloud = (CordCloud) entry.getValue ();
+            ThreadUtil.execute (() -> {
+                CordCloud cordCloud = BeanUtil.toBean (entry.getValue (), CordCloud.class);
                 log.info ("用户 " + cordCloud.getUser ().getEmail () + " 是否已开启自动签到 : " + cordCloud.getIsCheckIn ());
                 if (cordCloud.getIsCheckIn ()) {
                     log.info ("开始自动签到用户 " + cordCloud.getSendEmail () + " ...");
