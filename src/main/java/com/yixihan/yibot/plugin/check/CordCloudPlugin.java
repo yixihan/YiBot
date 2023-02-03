@@ -6,9 +6,11 @@ import cn.hutool.core.thread.ThreadUtil;
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.http.HttpException;
 import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpResponse;
 import cn.hutool.json.JSON;
+import cn.hutool.json.JSONException;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import com.mikuac.shiro.common.utils.MsgUtils;
@@ -351,65 +353,70 @@ public class CordCloudPlugin extends BotPlugin {
      * @param bot qq bot
      */
     private void checkInCordCloud(@NotNull CordCloud cordCloud, @NotNull Bot bot) {
-        // 登录, 设置 cookie
-        String cookie = loginCordCloud (cordCloud, bot);
-        if (cookie == null) {
-            return;
-        }
-        cordCloud.setCookie (cookie);
+        try {
+            // 登录, 设置 cookie
+            String cookie = loginCordCloud (cordCloud, bot);
+            if (cookie == null) {
+                return;
+            }
+            cordCloud.setCookie (cookie);
         
-        // 签到
-        HttpResponse response = HttpRequest.post (prop.getCordCloudCheckIn ())
-                .header ("cookie", cordCloud.getCookie ())
-                .execute ();
+            // 签到
+            HttpResponse response = HttpRequest.post (prop.getCordCloudCheckIn ())
+                    .header ("cookie", cordCloud.getCookie ())
+                    .execute ();
         
-        JSONObject msg = JSONUtil.parseObj (response.body ());
-        if (response.getStatus () == 200) {
-            String message;
-            if (msg.getInt ("ret") == 0) {
-                message = msg.getStr ("msg");
-            } else {
-                String str = StringUtils.decodeUnicode (msg.getStr ("msg"));
-                StringBuilder sb = new StringBuilder ();
-                for (char c : str.toCharArray ()) {
-                    if (c >= '0' && c <= '9') {
-                        sb.append (c);
+            JSONObject msg = JSONUtil.parseObj (response.body ());
+            if (response.getStatus () == 200) {
+                String message;
+                if (msg.getInt ("ret") == 0) {
+                    message = msg.getStr ("msg");
+                } else {
+                    String str = StringUtils.decodeUnicode (msg.getStr ("msg"));
+                    StringBuilder sb = new StringBuilder ();
+                    for (char c : str.toCharArray ()) {
+                        if (c >= '0' && c <= '9') {
+                            sb.append (c);
+                        }
                     }
+                    String cordCloudAvgCnt = StrUtil.toStringOrNull (redisTemplate.opsForValue ()
+                            .get (prop.getCordCloudAvgCntName ()));
+                    double cnt = cordCloudAvgCnt == null ? 1 : Double.parseDouble (cordCloudAvgCnt);
+                    String cordCloudAvgSum = StrUtil.toStringOrNull (redisTemplate.opsForValue ()
+                            .get (prop.getCordCloudAvgSumName ()));
+                    double sum = cordCloudAvgSum == null ? 1 : Double.parseDouble (cordCloudAvgSum);
+                    double avg = NumberUtil.div (sum, cnt);
+                    double thisSum = Integer.parseInt (sb.toString ());
+                    cnt++;
+                    sum += thisSum;
+                    BigDecimal percentage = NumberUtil.round (NumberUtil.mul (NumberUtil.div (thisSum, avg), 100), 2);
+                    redisTemplate.opsForValue ().set (prop.getCordCloudAvgCntName (), cnt);
+                    redisTemplate.opsForValue ().set (prop.getCordCloudAvgSumName (), sum);
+                    if (avg != 0) {
+                        msg.set ("avg", "本次签到获得流量是平均签到流量的 " + percentage + "%");
+                    }
+                    message = buildMessage (msg);
+                    
                 }
-                String cordCloudAvgCnt = StrUtil.toStringOrNull (redisTemplate.opsForValue ()
-                        .get (prop.getCordCloudAvgCntName ()));
-                double cnt = cordCloudAvgCnt == null ? 1 : Double.parseDouble (cordCloudAvgCnt);
-                String cordCloudAvgSum = StrUtil.toStringOrNull (redisTemplate.opsForValue ()
-                        .get (prop.getCordCloudAvgSumName ()));
-                double sum = cordCloudAvgSum == null ? 1 : Double.parseDouble (cordCloudAvgSum);
-                double avg = NumberUtil.div (sum, cnt);
-                double thisSum = Integer.parseInt (sb.toString ());
-                cnt++;
-                sum += thisSum;
-                BigDecimal percentage = NumberUtil.round (NumberUtil.mul (NumberUtil.div (thisSum, avg), 100), 2);
-                redisTemplate.opsForValue ().set (prop.getCordCloudAvgCntName (), cnt);
-                redisTemplate.opsForValue ().set (prop.getCordCloudAvgSumName (), sum);
-                if (avg != 0) {
-                    msg.set ("avg", "本次签到获得流量是平均签到流量的 " + percentage + "%");
+                log.info ("message : {}", message);
+                if (cordCloud.getIsSendEmail () != null && cordCloud.getIsSendEmail ()) {
+                    mailSendService.sendMail (message, cordCloud.getSendEmail ());
+                    log.info ("邮件发送成功");
                 }
-                message = buildMessage (msg);
-                
+                if (cordCloud.getIsSendQQMsg () != null && cordCloud.getIsSendQQMsg ()) {
+                    bot.sendPrivateMsg (cordCloud.getSendQQ (), message, false);
+                    log.info ("QQ消息发送成功");
+                }
+            } else {
+                log.warn ("签到失败!");
+                log.warn (msg.getStr ("msg"));
+                String errMsg = "自动签到签到失败, 失败原因 : " + msg.getStr ("msg");
+                mailSendService.sendMail (errMsg, cordCloud.getSendEmail ());
+                bot.sendPrivateMsg (cordCloud.getSendQQ (), errMsg, false);
             }
-            log.info ("message : {}", message);
-            if (cordCloud.getIsSendEmail () != null && cordCloud.getIsSendEmail ()) {
-                mailSendService.sendMail (message, cordCloud.getSendEmail ());
-                log.info ("邮件发送成功");
-            }
-            if (cordCloud.getIsSendQQMsg () != null && cordCloud.getIsSendQQMsg ()) {
-                bot.sendPrivateMsg (cordCloud.getSendQQ (), message, false);
-                log.info ("QQ消息发送成功");
-            }
-        } else {
-            log.warn ("签到失败!");
-            log.warn (msg.getStr ("msg"));
-            String errMsg = "自动签到签到失败, 失败原因 : " + msg.getStr ("msg");
-            mailSendService.sendMail (errMsg, cordCloud.getSendEmail ());
-            bot.sendPrivateMsg (cordCloud.getSendQQ (), errMsg, false);
+        } catch (Exception e) {
+            log.error ("出现异常 : {}", e.getMessage (), e);
+            checkInCordCloud (cordCloud, bot);
         }
     }
     
