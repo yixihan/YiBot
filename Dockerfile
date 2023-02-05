@@ -1,4 +1,4 @@
-FROM myos
+FROM ccr.ccs.tencentyun.com/yixihan/myos
 EXPOSE 19999
 
 MAINTAINER yixihan<3113788997@qq.com>
