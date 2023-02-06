@@ -25,6 +25,7 @@ import com.mikuac.shiro.core.BotPlugin;
 import com.mikuac.shiro.dto.event.message.GroupMessageEvent;
 import com.yixihan.yibot.config.GroupConfig;
 import com.yixihan.yibot.constant.RedisKeyConstants;
+import com.yixihan.yibot.properties.CommonProperties;
 import com.yixihan.yibot.properties.WordCloudProperties;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
@@ -59,6 +60,9 @@ public class WordCloudPlugin extends BotPlugin {
     private WordCloudProperties prop;
     @Resource
     private BotContainer botContainer;
+    
+    @Resource
+    private CommonProperties commonProp;
     
     @Override
     public int onGroupMessage(@NotNull Bot bot, @NotNull GroupMessageEvent event) {
@@ -138,7 +142,7 @@ public class WordCloudPlugin extends BotPlugin {
     
     private Bot getBot() {
         // 机器人账号
-        long botId = 2535774265L;
+        long botId = commonProp.getSelfId ();
         // 通过机器人账号取出 Bot 对象
         return botContainer.robots.get (botId);
     }

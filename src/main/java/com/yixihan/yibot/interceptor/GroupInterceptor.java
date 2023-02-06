@@ -7,6 +7,7 @@ import com.mikuac.shiro.core.BotMessageEventInterceptor;
 import com.mikuac.shiro.dto.event.message.GroupMessageEvent;
 import com.mikuac.shiro.dto.event.message.MessageEvent;
 import com.yixihan.yibot.config.GroupConfig;
+import com.yixihan.yibot.properties.CommonProperties;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -25,9 +26,13 @@ public class GroupInterceptor implements BotMessageEventInterceptor {
     @Resource
     private GroupConfig config;
     
+    @Resource
+    private CommonProperties prop;
+    
     
     @Override
     public boolean preHandle(Bot bot, MessageEvent sourceEvent) {
+        prop.setSelfId (bot.getSelfId ());
         String sendMessage;
         if (sourceEvent instanceof GroupMessageEvent) {
             GroupMessageEvent event = BeanUtil.toBean (sourceEvent, GroupMessageEvent.class);

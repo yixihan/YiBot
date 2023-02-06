@@ -6,7 +6,6 @@ import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpResponse;
-import cn.hutool.json.JSON;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import com.mikuac.shiro.common.utils.MsgUtils;
@@ -15,10 +14,12 @@ import com.mikuac.shiro.core.BotContainer;
 import com.mikuac.shiro.core.BotPlugin;
 import com.mikuac.shiro.dto.event.message.GroupMessageEvent;
 import com.yixihan.yibot.config.GroupConfig;
+import com.yixihan.yibot.constant.CommonConstants;
 import com.yixihan.yibot.constant.NumberConstants;
 import com.yixihan.yibot.dto.cordcloud.CordCloud;
 import com.yixihan.yibot.dto.cordcloud.CordCloudMsg;
 import com.yixihan.yibot.dto.cordcloud.User;
+import com.yixihan.yibot.properties.CommonProperties;
 import com.yixihan.yibot.properties.CordCloudProperties;
 import com.yixihan.yibot.serivce.MailSendService;
 import com.yixihan.yibot.utils.StringUtils;
@@ -60,11 +61,14 @@ public class CordCloudPlugin extends BotPlugin {
     private CordCloudProperties prop;
     
     @Resource
+    private CommonProperties commonProp;
+    
+    @Resource
     private MailSendService mailSendService;
     
     public Bot getBot() {
         // 机器人账号
-        long botId = 2535774265L;
+        long botId = commonProp.getSelfId ();
         // 通过机器人账号取出 Bot 对象
         return botContainer.robots.get (botId);
     }
@@ -361,7 +365,10 @@ public class CordCloudPlugin extends BotPlugin {
             HttpResponse response = HttpRequest.post (prop.getCordCloudCheckIn ())
                     .header ("cookie", cordCloud.getCookie ())
                     .execute ();
-        
+            log.info (response.body ());
+            if (StrUtil.isBlank (response.body ())) {
+                bot.sendPrivateMsg (CommonConstants.MASTER_ID, "响应体为空", false);
+            }
             JSONObject msg = JSONUtil.parseObj (response.body ());
             if (response.getStatus () == 200) {
                 String message;
@@ -412,7 +419,7 @@ public class CordCloudPlugin extends BotPlugin {
             }
         } catch (Exception e) {
             log.error ("出现异常 : {}", e.getMessage (), e);
-            checkInCordCloud (cordCloud, bot);
+            bot.sendPrivateMsg (CommonConstants.MASTER_ID, "签到插件出现异常 : " + e.getMessage (), false);
         }
     }
     

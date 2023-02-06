@@ -8,6 +8,7 @@ import com.mikuac.shiro.core.BotPlugin;
 import com.mikuac.shiro.dto.event.message.GroupMessageEvent;
 import com.yixihan.yibot.constant.PatternConstants;
 import com.yixihan.yibot.enums.CQCodeEnums;
+import com.yixihan.yibot.properties.CommonProperties;
 import com.yixihan.yibot.utils.CQCodeUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
@@ -40,6 +41,9 @@ public class AutoRemindPlugin extends BotPlugin {
     
     @Resource
     private BotContainer botContainer;
+    
+    @Resource
+    private CommonProperties commonProp;
     
     
     /**
@@ -161,7 +165,7 @@ public class AutoRemindPlugin extends BotPlugin {
     
     private Bot getBot() {
         // 机器人账号
-        long botId = 2535774265L;
+        long botId = commonProp.getSelfId ();
         // 通过机器人账号取出 Bot 对象
         return botContainer.robots.get (botId);
     }
