@@ -1,16 +1,12 @@
 package com.yixihan.yibot.plugin.check;
 
-import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.thread.ThreadUtil;
 import cn.hutool.core.util.NumberUtil;
-import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.hutool.http.HttpException;
 import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpResponse;
 import cn.hutool.json.JSON;
-import cn.hutool.json.JSONException;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import com.mikuac.shiro.common.utils.MsgUtils;
@@ -335,7 +331,7 @@ public class CordCloudPlugin extends BotPlugin {
         Bot bot = getBot ();
         for (Map.Entry<Object, Object> entry : map.entrySet ()) {
             ThreadUtil.execute (() -> {
-                CordCloud cordCloud = BeanUtil.toBean (entry.getValue (), CordCloud.class);
+                CordCloud cordCloud = JSONUtil.toBean (entry.getValue ().toString (), CordCloud.class);
                 log.info ("用户 " + cordCloud.getUser ().getEmail () + " 是否已开启自动签到 : " + cordCloud.getIsCheckIn ());
                 if (cordCloud.getIsCheckIn ()) {
                     log.info ("开始自动签到用户 " + cordCloud.getSendEmail () + " ...");
