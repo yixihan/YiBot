@@ -177,7 +177,7 @@ public class CordCloudPlugin extends BotPlugin {
                 user.setEmail (params[2]);
                 CordCloud cordCloud = new CordCloud (user);
                 cordCloud.setIsCheckIn (false);
-                JSON json = JSONUtil.parse (cordCloud);
+                String json = JSONUtil.toJsonStr (cordCloud);
                 redisTemplate.opsForHash ().put (prop.getCordCloudName (), params[2], json);
                 return "修改成功";
             } else if (params.length == 7) {
@@ -194,7 +194,7 @@ public class CordCloudPlugin extends BotPlugin {
                 if (msg.getRet () == 0) {
                     return msg.getMsg ();
                 }
-                JSON json = JSONUtil.parse (cordCloud);
+                String json = JSONUtil.toJsonStr (cordCloud);
                 redisTemplate.opsForHash ().put (prop.getCordCloudName (), params[2], json);
                 return "修改成功";
             } else if (params.length == 8) {
@@ -211,7 +211,7 @@ public class CordCloudPlugin extends BotPlugin {
                     if (msg.getRet () == 0) {
                         return msg.getMsg ();
                     }
-                    JSON json = JSONUtil.parse (cordCloud);
+                    String json = JSONUtil.toJsonStr (cordCloud);
                     redisTemplate.opsForHash ().put (prop.getCordCloudName (), params[2], json);
                     return "修改成功";
                 } else if ("true".equals (params[3]) && "false".equals (params[5]) && "true".equals (params[6])) {
@@ -227,7 +227,7 @@ public class CordCloudPlugin extends BotPlugin {
                     if (msg.getRet () == 0) {
                         return msg.getMsg ();
                     }
-                    JSON json = JSONUtil.parse (cordCloud);
+                    String json = JSONUtil.toJsonStr (cordCloud);
                     redisTemplate.opsForHash ().put (prop.getCordCloudName (), params[2], json);
                     return "修改成功";
                 } else {
@@ -249,7 +249,7 @@ public class CordCloudPlugin extends BotPlugin {
                     if (msg.getRet () == 0) {
                         return msg.getMsg ();
                     }
-                    JSON json = JSONUtil.parse (cordCloud);
+                    String json = JSONUtil.toJsonStr (cordCloud);
                     redisTemplate.opsForHash ().put (prop.getCordCloudName (), params[2], json);
                     return "修改成功";
                 } else {
