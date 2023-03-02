@@ -49,6 +49,7 @@ public class ChatGPTPlugin extends BotPlugin {
                     .text (prop.getModel ())
                     .build ();
             bot.sendGroupMsg (event.getGroupId (), sendMessage, false);
+            return MESSAGE_IGNORE;
         }
     
         if (eventMessage.length () < FIVE || eventMessage.charAt (FOUR) != ' ') {
