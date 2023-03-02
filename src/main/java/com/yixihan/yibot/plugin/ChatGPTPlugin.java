@@ -1,5 +1,6 @@
 package com.yixihan.yibot.plugin;
 
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpResponse;
@@ -98,14 +99,11 @@ public class ChatGPTPlugin extends BotPlugin {
     
         ChatGPT3Body chatGPTBody = new ChatGPT3Body ();
         chatGPTBody.setModel (prop.getModel ());
-        List<Message> messageList = new ArrayList<> ();
-        for (String str : question.split ("\n")) {
-            Message message = new Message ();
-            message.setContent (str);
-            message.setRole ("user");
-            messageList.add (message);
-        }
-        chatGPTBody.setMessage (messageList);
+        Message message = new Message ();
+        message.setContent (question);
+        message.setRole ("user");
+        
+        chatGPTBody.setMessage (CollectionUtil.newArrayList (message));
         String params = JSONUtil.parse (chatGPTBody).toStringPretty ();
         
         try {
@@ -117,9 +115,9 @@ public class ChatGPTPlugin extends BotPlugin {
         
             if (response.isOk ()) {
                 JSONObject body = JSONUtil.parseObj (response.body ());
-                String text = JSONUtil.parseObj (JSONUtil.parseArray (body.getStr ("choices")).get (0)).getStr ("text");
-                log.info ("text : {}", text);
-                return text;
+                Message ans = JSONUtil.parseObj (JSONUtil.parseArray (body.getStr ("choices")).get (0)).getBean ("message", Message.class);
+                log.info ("ans : {}", ans);
+                return ans.getContent ();
             }
         } catch (Exception e) {
             log.info ("出错捏");
