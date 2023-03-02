@@ -10,13 +10,18 @@ import com.mikuac.shiro.core.Bot;
 import com.mikuac.shiro.core.BotPlugin;
 import com.mikuac.shiro.dto.event.message.GroupMessageEvent;
 import com.yixihan.yibot.constant.CommonConstants;
-import com.yixihan.yibot.dto.chat.ChatGPTBody;
+import com.yixihan.yibot.dto.chat.ChatGPT3Body;
+import com.yixihan.yibot.dto.chat.Message;
 import com.yixihan.yibot.properties.ChatGPTProperties;
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static com.yixihan.yibot.constant.NumberConstants.FIVE;
 import static com.yixihan.yibot.constant.NumberConstants.FOUR;
@@ -89,13 +94,18 @@ public class ChatGPTPlugin extends BotPlugin {
         return super.onGroupMessage (bot, event);
     }
     
-    private String chatGPT (String question) {
+    private String chatGPT ( String question) {
     
-        ChatGPTBody chatGPTBody = new ChatGPTBody ();
+        ChatGPT3Body chatGPTBody = new ChatGPT3Body ();
         chatGPTBody.setModel (prop.getModel ());
-        chatGPTBody.setPrompt (question);
-        chatGPTBody.setTemperature (0);
-        chatGPTBody.setMax_tokens (4096);
+        List<Message> messageList = new ArrayList<> ();
+        for (String str : question.split ("\n")) {
+            Message message = new Message ();
+            message.setContent (str);
+            message.setRole ("user");
+            messageList.add (message);
+        }
+        chatGPTBody.setMessage (messageList);
         String params = JSONUtil.parse (chatGPTBody).toStringPretty ();
         
         try {
