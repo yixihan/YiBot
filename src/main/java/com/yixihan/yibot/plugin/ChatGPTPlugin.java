@@ -15,14 +15,10 @@ import com.yixihan.yibot.dto.chat.ChatGPT3Body;
 import com.yixihan.yibot.dto.chat.Message;
 import com.yixihan.yibot.properties.ChatGPTProperties;
 import lombok.extern.slf4j.Slf4j;
-import lombok.val;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import static com.yixihan.yibot.constant.NumberConstants.FIVE;
 import static com.yixihan.yibot.constant.NumberConstants.FOUR;
@@ -104,7 +100,7 @@ public class ChatGPTPlugin extends BotPlugin {
         message.setRole ("user");
         
         chatGPTBody.setMessage (CollectionUtil.newArrayList (message));
-        String params = JSONUtil.parse (chatGPTBody).toStringPretty ();
+        String params = JSONUtil.parse (chatGPTBody).toString ();
         
         try {
             HttpResponse response = HttpRequest.post (prop.getApiUrl ())
@@ -112,15 +108,17 @@ public class ChatGPTPlugin extends BotPlugin {
                     .header ("Content-Type", "application/json")
                     .body (params)
                     .execute ();
+            log.info ("body : {}", response.body ());
         
             if (response.isOk ()) {
                 JSONObject body = JSONUtil.parseObj (response.body ());
-                Message ans = JSONUtil.parseObj (JSONUtil.parseArray (body.getStr ("choices")).get (0)).getBean ("message", Message.class);
+                Message ans = JSONUtil.parseObj (JSONUtil.parseArray (body.getStr ("choices"))
+                        .get (0)).getBean ("message", Message.class);
                 log.info ("ans : {}", ans);
                 return ans.getContent ();
             }
         } catch (Exception e) {
-            log.info ("出错捏");
+            log.error ("出错捏", e);
             return "出错捏";
         }
         return null;
