@@ -42,6 +42,14 @@ public class ChatGPTPlugin extends BotPlugin {
         if (!eventMessage.startsWith (CommonConstants.CHAT_WORD_ONE)) {
             return MESSAGE_IGNORE;
         }
+        
+        if ("chat 获取当前模型".equals (eventMessage)) {
+            sendMessage = MsgUtils.builder ()
+                    .reply (event.getMessageId ())
+                    .text (prop.getModel ())
+                    .build ();
+            bot.sendGroupMsg (event.getGroupId (), sendMessage, false);
+        }
     
         if (eventMessage.length () < FIVE || eventMessage.charAt (FOUR) != ' ') {
             sendMessage = MsgUtils.builder ()
