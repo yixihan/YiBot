@@ -19,4 +19,7 @@ public class ChatGPTProperties {
     
     @Value ("${chatGPT.api-key}")
     private String apiKey;
+    
+    @Value ("${chatGPT.model")
+    private String model;
 }

@@ -83,10 +83,10 @@ public class ChatGPTPlugin extends BotPlugin {
     private String chatGPT (String question) {
     
         ChatGPTBody chatGPTBody = new ChatGPTBody ();
-        chatGPTBody.setModel ("text-davinci-003");
+        chatGPTBody.setModel (prop.getModel ());
         chatGPTBody.setPrompt (question);
         chatGPTBody.setTemperature (0);
-        chatGPTBody.setMax_tokens (1024);
+        chatGPTBody.setMax_tokens (4096);
         String params = JSONUtil.parse (chatGPTBody).toStringPretty ();
         
         try {
